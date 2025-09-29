@@ -10,6 +10,27 @@
             "console": "integratedTerminal",
             "args": ["--config", "${workspaceFolder}/settings/dev_test.yaml"],
             "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "german2english",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "anker.cli",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": ["--config", "${workspaceFolder}/settings/german2english.yaml"],
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "english_russian",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "anker.cli",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": ["--config", "${workspaceFolder}/settings/english_russian.yaml"],
+            "python": "${workspaceFolder}/.venv/bin/python"
         }
+
     ]
 }
