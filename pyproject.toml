@@ -19,6 +19,7 @@ dependencies = [
     "tenacity",
     "pyyaml",
     "rich",
+    "jinja2",
 ]
 
 [project.optional-dependencies]

@@ -16,7 +16,14 @@ class StrictModel(BaseModel):
 
 class LLMOptions(StrictModel):
     model: str = Field(default="gpt-5")
-    prompt: str | None = None
+    # Path to the prompt or prompt template (".j2")
+    prompt_template: Path = Field(default=Path("./settings/prompts/prompt_template.md.j2"))
+    # Optional file with additional custom instructions to be inlined into the prompt
+    custom_instructions: Path | None = Field(default=None)
+    # Optional directory with few-shot examples to be inlined into the prompt. 
+    # Each example consists of a pair of files with the same stem: 
+    # "N.txt" (input) and "N.tsv" (output).
+    few_shot_examples: Path | None = Field(default=None)
 
 
 class OpenAIProviderAccess(StrictModel):
@@ -89,6 +96,11 @@ class Settings(BaseSettings):
 
     # Whether to confirm steps before they are executed
     confirm_steps: bool = True
+
+    # The language being studied
+    language_a: str
+    # The known/native language
+    language_b: str
 
     # The type of notes to create. Should be consistent with the LLM prompt.
     note_type: Literal["forward_and_backward", "forward_only"] = Field(default="forward_and_backward")

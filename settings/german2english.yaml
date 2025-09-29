@@ -11,6 +11,11 @@ confirm_steps: true
 # Verbosity
 log_level: INFO
 
+# The language being studied
+language_a: German
+# The known language
+language_b: English
+
 # The type of notes to create. Should be consistent with the LLM prompt.
 # One of: "forward_and_backward" or "forward_only"
 note_type: forward_and_backward
@@ -21,7 +26,9 @@ llm:
   provider: openai
   options:
     model: gpt-5
-    prompt: ./settings/prompts/german2english.md
+    prompt_template: ./settings/prompts/prompt_template.md.j2
+    custom_instructions: ./settings/prompts/custom_instructions/german_english_b1.md
+    few_shot_examples: ./settings/prompts/few_shot_examples/forward_and_backward_german_english_b1
   providers:
     openai:
       api_key:

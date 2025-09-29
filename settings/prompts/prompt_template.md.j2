@@ -1,0 +1,56 @@
+Based on the text the user provides, create a dictionary in TSV format, where cells in a table row are separated by the `\t` symbol and rows are separated by the `\n` symbol. Output only these TSV rows. **No any kind of quotes, no introductory phrases, no any table headings — just the TSV rows with the vocabulary.**
+
+The order of words is not important. It is not necessary to put them in alphabetical order. The best approach is to list words and phrases as you encounter them in the provided text. But try to avoid exact duplicates.
+
+The purpose of this dictionary is to be used in the Anki app to memorize translations. The dictionary should contain words, short fixed phrases, and useful sentence constructions if there are any in the provided text.
+
+**NEVER use any abbreviations**, such as 'sth.', 'smb.', 'напр.', 'что-л.', 'т.п.', 'тех.', 'поэтич.', 'tech.', 'etw.', 'Akk. 'Dat.'! You must **ALWAYS write the whole words** in the language of the phrase, like 'something', 'somebody', 'например', 'что-либо', 'тому подобное', 'etwas', 'Dativ', 'Akkusativ', etc.
+
+You must **never mix languages within a single cell.** Never, even when it seems convenient for clarifying a translation. Only one language within a cell!
+
+If there are several synonyms, slightly enrich their translations so that it’s clear how they differ. If a translation has a very broad meaning, extend it a little to make it more precise. But overall, keep translations concise.
+
+Every row in the output has exactly 4 cells: a word or phrase in the 1st column, its translation in the 2nd column, and the language labels in the 3rd and 4th columns.
+
+{% if note_type == "forward_and_backward" %}
+The dictionary is one-way. All the cells in the 1st column are in {{ language_a }}, and all the cells in the 2nd column are in {{ language_b }}. The 3rd column is always `{{ language_a }}`, and the 4th column is always `{{ language_b }}`.
+The output format is:
+```
+{{ language_a }} word	its {{ language_b }} translation	{{ language_a }}	{{ language_b }}
+another {{ language_a }} word	another {{ language_b }} translation	{{ language_a }}	{{ language_b }}
+...
+```
+Imagine yourself learning this table in the following way: given a word from the 1st column, you need to recall its translation from the 2nd column, and vice versa: given a word from the 2nd column, you need to recall its translation from the 1st column.
+{% elif note_type == "forward_only" %}
+The dictionary is two-way. The pairs "{{ language_a }} -> {{ language_b }}" are interleaved with "{{ language_b }} -> {{ language_a }}" pairs.
+The output format is:
+```
+{{ language_a }} word	its {{ language_b }} translation	{{ language_a }}	{{ language_b }}
+its {{ language_b }} translation	{{ language_a }} word	{{ language_b }}	{{ language_a }}
+another {{ language_a }} word	another {{ language_b }} translation	{{ language_a }}	{{ language_b }}
+another {{ language_b }} translation	another {{ language_a }} word	{{ language_b }}	{{ language_a }}
+...
+```
+In general, "{{ language_b }} -> {{ language_a }}" pairs should just repeat the "{{ language_a }} -> {{ language_b }}" pairs in the reverse order, but sometimes you may adjust them to make the learning process more natural, understandable, precise. Imagine yourself learning this table in the following way: given a word from the 1st column, you need to recall its translation from the 2nd column.
+{% else %}
+{% set _ = fail('Invalid note type: `' ~ note_type ~ '`') %}
+{% endif %}
+
+{{ custom_instructions }}
+
+{% if few_shot_examples %}
+**Strictly refer to the following examples:**
+{% for example in few_shot_examples %}
+
+--------------------------------
+User input:
+```
+{{ example.input }}
+```
+
+Your answer:
+```
+{{ example.output }}
+```
+{% endfor %}
+{% endif %}
