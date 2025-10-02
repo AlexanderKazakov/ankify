@@ -2,6 +2,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "_test_aws_tts_ssml",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "anker.tts._test_aws_tts_ssml",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "python": "${workspaceFolder}/.venv/bin/python",
+        },
+        {
             "name": "anker",
             "type": "debugpy",
             "request": "launch",
