@@ -1,0 +1,22 @@
+персонал	personnel
+персонал	staff
+staff	штат
+staff	персонал
+go out	бывать в обществе
+go out	гаснуть
+выйти на улицу	go outside
+go outside	выйти на улицу
+pep talks	ободряющие речи
+pep talk	зажигательная речь
+кишечник	guts
+кишечник	bowel
+кишечник	intestines
+intestine	кишечник
+учтивость	courtesy
+courtesy	вежливость
+courtesy	учтивость
+вежливый	courteous
+вежливый	polite
+courteous	учтивый
+courteous	вежливый
+goblet	кубок

@@ -1,14 +1,18 @@
-Based on the text the user provides, create a dictionary in TSV format, where cells in a table row are separated by the `\t` symbol and rows are separated by the `\n` symbol. Output only these TSV rows. **No any kind of quotes, no introductory phrases, no any table headings — just the TSV rows with the vocabulary.**
+Based on the text the user provides, create a **high-quality** vocabulary dictionary in TSV format, where cells in a table row are separated by the `\t` symbol and rows are separated by the `\n` symbol. Output only these TSV rows. **No quotes of any kind, no introductory phrases, no table headings — just the TSV rows with the vocabulary.**
 
-The order of words is not important. It is not necessary to put them in alphabetical order. The best approach is to list words and phrases as you encounter them in the provided text. But try to avoid exact duplicates.
+The order of words is not important. It is not necessary to put them in alphabetical order. The best approach is to list words and phrases as you encounter them in the provided text. But avoid exact duplicates (group the translations if you find several of the same word or phrase).
 
 The purpose of this dictionary is to be used in the Anki app to memorize translations. The dictionary should contain words, short fixed phrases, and useful sentence constructions if there are any in the provided text.
 
-**NEVER use any abbreviations**, such as 'sth.', 'smb.', 'напр.', 'что-л.', 'т.п.', 'тех.', 'поэтич.', 'tech.', 'etw.', 'Akk. 'Dat.'! You must **ALWAYS write the whole words** in the language of the phrase, like 'something', 'somebody', 'например', 'что-либо', 'тому подобное', 'etwas', 'Dativ', 'Akkusativ', etc.
+**NEVER use any abbreviations**, such as 'sth.', 'smb.', 'напр.', 'что-л.', 'т.п.', 'тех.', 'поэтич.', 'tech.', 'etw.', 'Dat.'! You must **ALWAYS write whole words** in the language of the phrase, like 'something', 'somebody', 'например', 'что-либо', 'тому подобное', 'etwas', 'Dativ', etc.
 
 You must **never mix languages within a single cell.** Never, even when it seems convenient for clarifying a translation. Only one language within a cell!
 
-If there are several synonyms, slightly enrich their translations so that it’s clear how they differ. If a translation has a very broad meaning, extend it a little to make it more precise. But overall, keep translations concise.
+Think deeply about every translation. If there are several synonyms, slightly enrich their translations so that it's clear how they differ. If a translation has a very broad meaning, extend it **a little** to make it more precise. But overall, keep translations concise. Your task is not to write all the possible translations of a word, but to pick only the most common, typical, and precise ones. This is not a thesaurus with all possible translations, but a vocabulary dictionary for learning. You have to choose clear, precise, concise, and common translations. DO NOT write 5 synonyms for the same word, choose only one or two best ones. Maintain the adequate balance between conciseness and precision, refer to the examples below.
+
+Note that the user input may contain orthographical mistakes, or incorrect/not fully correct/incomplete translations. You must correct them in such cases.
+
+Separate synonyms with commas. Separate different translations of the same word with semicolons.
 
 Every row in the output has exactly 4 cells: a word or phrase in the 1st column, its translation in the 2nd column, and the language labels in the 3rd and 4th columns.
 
@@ -31,7 +35,7 @@ another {{ language_a }} word	another {{ language_b }} translation	{{ language_a
 another {{ language_b }} translation	another {{ language_a }} word	{{ language_b }}	{{ language_a }}
 ...
 ```
-In general, "{{ language_b }} -> {{ language_a }}" pairs should just repeat the "{{ language_a }} -> {{ language_b }}" pairs in the reverse order, but sometimes you may adjust them to make the learning process more natural, understandable, precise. Imagine yourself learning this table in the following way: given a word from the 1st column, you need to recall its translation from the 2nd column.
+In general, "{{ language_b }} -> {{ language_a }}" pairs should just repeat the "{{ language_a }} -> {{ language_b }}" pairs in the reverse order, but sometimes you may adjust them to make the learning process more natural, understandable, and precise. Imagine yourself learning this table in the following way: given a word from the 1st column, you need to recall its translation from the 2nd column.
 {% else %}
 {% set _ = fail('Invalid note type: `' ~ note_type ~ '`') %}
 {% endif %}
@@ -39,10 +43,12 @@ In general, "{{ language_b }} -> {{ language_a }}" pairs should just repeat the 
 {{ custom_instructions }}
 
 {% if few_shot_examples %}
-**Strictly refer to the following examples:**
+**Refer to the following examples:**
 {% for example in few_shot_examples %}
 
+{% if loop.index0 > 0 %}
 --------------------------------
+{% endif %}
 User input:
 ```
 {{ example.input }}

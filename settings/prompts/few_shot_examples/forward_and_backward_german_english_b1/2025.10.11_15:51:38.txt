@@ -1,0 +1,19 @@
+Kuss	kiss
+fressen	eat up
+rabbit	Kaninchen
+human	menschlich
+human	Mensch
+mensch	person
+korn	grain
+huhn	chicken
+werkzeuge	tools
+zeug	things
+Waschzeug	Toiletries
+momentan	currently
+momentan	at the moment
+currently	gegenwärtig
+currently	momentan
+zurzeit	currently
+
+die App
+Leine

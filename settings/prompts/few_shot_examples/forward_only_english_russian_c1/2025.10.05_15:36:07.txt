@@ -1,0 +1,33 @@
+цельнозерновой	whole grain
+wholemeal	цельнозерновой
+loafer	лодырь
+loaf	каравай
+loaf	бездельничать
+loaf	слоняться
+loaf	буханка
+affably	учтиво
+affably	приветливо
+sullen	угрюмый
+dismal	унылый
+dismal	мрачный
+lantern	фонарь
+sly	лукавый
+sly	хитрый
+surmise	предположение
+overhaul	тщательный осмотр
+overhaul	капитальный ремонт
+haul	трофей
+haul	улов
+haul	перевозить
+haul	тянуть
+haul	буксировать
+at first	на первых порах
+at first	поначалу
+поначалу	at first
+get along with	быть в хороших отношениях
+get along with	уживаться
+get along with	ладить
+ладить с	cope with
+ладить с	get along with
+cope with	ладить с
+cope with	справиться с

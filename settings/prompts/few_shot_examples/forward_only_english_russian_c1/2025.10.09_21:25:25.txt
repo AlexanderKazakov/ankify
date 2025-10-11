@@ -1,0 +1,28 @@
+подвиг	act of bravery
+подвиг	feat
+текучий	fluid
+fluid	жидкий
+fluid	текучий
+fluid	жидкость
+roof of the mouth	нёбо
+prop	подпорка
+prop	подпирать
+prop	опора
+prop open	опора открыта
+propped open	подпертый открытый
+comb	расческа
+comb	гребень
+shorthand	стенография
+longhand	от руки
+nasty	мерзкий
+nasty	противный
+ведь	after all
+словесный	oral
+словесный	verbal
+verbal	устный
+verbal	словесный
+interim payment	промежуточный платеж
+intervening period	промежуточный период
+interim	промежуточный
+interim	временный
+down payment	первый взнос
