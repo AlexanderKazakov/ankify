@@ -124,7 +124,7 @@ def main1() -> None:
     # Load voices and AWS access from YAML config used for dev testing
     settings = Settings(config=Path("./settings/dev_test.yaml").resolve())
 
-    client = _build_polly_client(settings.tts.providers.aws)
+    client = _build_polly_client(settings.providers.aws)
 
     out_dir = Path("./tmp/tts_ssml").resolve()
     shutil.rmtree(out_dir, ignore_errors=True)
@@ -155,7 +155,7 @@ def main2() -> None:
     out_dir.mkdir()
 
     aws_client = AWSPollySingleLanguageClient(
-        access_settings=settings.tts.providers.aws,
+        access_settings=settings.providers.aws,
         language_settings=settings.tts.languages["english"].options,
     )
     for name, text in [
@@ -176,7 +176,7 @@ def main2() -> None:
         logger.info("Saved %s", path)
 
     aws_client = AWSPollySingleLanguageClient(
-        access_settings=settings.tts.providers.aws,
+        access_settings=settings.providers.aws,
         language_settings=settings.tts.languages["german"].options,
     )
     for name, text in [
@@ -197,7 +197,7 @@ def main2() -> None:
         logger.info("Saved %s", path)
 
     aws_client = AWSPollySingleLanguageClient(
-        access_settings=settings.tts.providers.aws,
+        access_settings=settings.providers.aws,
         language_settings=settings.tts.languages["russian"].options,
     )
     for name, text in [

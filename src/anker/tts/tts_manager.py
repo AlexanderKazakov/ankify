@@ -3,9 +3,10 @@ import uuid
 
 from ..vocab_entry import VocabEntry
 from ..settings import (
+    Settings,
     Text2SpeechSettings,
     LanguageTTSConfig,
-    TTSAggregatedProviderAccessSettings,
+    ProviderAccessSettings,
 )
 from ..logging import get_logger
 from .tts_base import TTSSingleLanguageClient
@@ -14,7 +15,7 @@ from .aws_tts import AWSPollySingleLanguageClient
 
 def create_tts_single_language_client(
     config: LanguageTTSConfig,
-    providers: TTSAggregatedProviderAccessSettings | None,
+    providers: ProviderAccessSettings,
 ) -> TTSSingleLanguageClient:
     if config.provider == "aws":
         return AWSPollySingleLanguageClient(
@@ -26,13 +27,14 @@ def create_tts_single_language_client(
 
 
 class TTSManager:
-    def __init__(self, config: Text2SpeechSettings) -> None:
-        self.config = config
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
+        config: Text2SpeechSettings = settings.tts
         self.logger = get_logger("anker.tts.manager")
         self.logger.debug("Initializing TTSManager with languages: %s", ", ".join(config.languages.keys()))
 
         self.tts_clients: dict[str, TTSSingleLanguageClient] = {
-            language: create_tts_single_language_client(lang_cfg, config.providers)
+            language: create_tts_single_language_client(lang_cfg, settings.providers)
             for language, lang_cfg in config.languages.items()
         }
         self.logger.debug("Initialized TTSManager")

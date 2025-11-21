@@ -30,9 +30,6 @@ llm:
     prompt_template: ./settings/prompts/prompt_template.md.j2
     custom_instructions: ./settings/prompts/custom_instructions/german_english_b1.md
     few_shot_examples: ./settings/prompts/few_shot_examples/forward_and_backward_german_english_b1
-  providers:
-    openai:
-      api_key:
 
 # Text-to-Speech: AWS Polly voices:
 # https://docs.aws.amazon.com/polly/latest/dg/available-voices.html
@@ -48,8 +45,12 @@ tts:
       options:
         voice_id: Daniel
         engine: neural
-  providers:
-    aws:
-      access_key_id:
-      secret_access_key:
-      region: eu-central-1
+
+# Provider access settings
+providers:
+  openai:
+    api_key:
+  aws:
+    access_key_id:
+    secret_access_key:
+    region: eu-central-1

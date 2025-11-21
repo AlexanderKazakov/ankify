@@ -1,15 +1,15 @@
 import openai
 
 from .llm_base import LLMClient
-from ..settings import LLMConfig
+from ..settings import LLMConfig, OpenAIProviderAccess
 
 
 class OpenAIClient(LLMClient):
-    def __init__(self, llm_config: LLMConfig) -> None:
+    def __init__(self, llm_config: LLMConfig, openai_access: OpenAIProviderAccess) -> None:
         super().__init__()
-        self._api_key = llm_config.providers.openai.api_key.get_secret_value()
+        api_key = openai_access.api_key.get_secret_value()
         self._model = llm_config.options.model
-        self._client = openai.OpenAI(api_key=self._api_key)
+        self._client = openai.OpenAI(api_key=api_key)
         self._logger.debug("Initialized OpenAI client")
 
     # we don't need retry here, it's handled within the openai sdk

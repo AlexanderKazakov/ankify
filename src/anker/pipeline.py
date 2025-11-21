@@ -25,8 +25,8 @@ class Pipeline:
         self.prompt = PromptBuilder(settings).build()
         self.logger.debug("Loaded LLM instructions:\n%s", self.prompt)
         
-        self.llm = create_llm_client(settings.llm)
-        self.tts = TTSManager(settings.tts)
+        self.llm = create_llm_client(settings)
+        self.tts = TTSManager(settings)
         self.anki_packager = AnkiDeckCreator(settings)
 
     def run(self) -> None:

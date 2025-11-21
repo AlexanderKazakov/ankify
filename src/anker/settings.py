@@ -39,18 +39,12 @@ class LLMOptions(StrictModel):
 
 
 class OpenAIProviderAccess(StrictModel):
-    """OpenAI provider credentials (prefer setting via environment variables)."""
+    """OpenAI provider credentials."""
 
     api_key: SecretStr | None = Field(
         default=None,
         description="OpenAI API key. Can be provided via env",
     )
-
-
-class LLMProviderAccessSettings(StrictModel):
-    """Credentials per LLM provider (merged with higher-priority env/CLI sources)."""
-
-    openai: OpenAIProviderAccess | None = None
 
 
 class LLMConfig(StrictModel):
@@ -63,10 +57,6 @@ class LLMConfig(StrictModel):
     options: LLMOptions = Field(
         default_factory=LLMOptions,
         description="Provider-agnostic LLM options such as model and prompt sources.",
-    )
-    providers: LLMProviderAccessSettings | None = Field(
-        default=None,
-        description="Provider-specific credentials. Lower priority than CLI/env/dotenv.",
     )
 
 
@@ -107,23 +97,20 @@ class AWSProviderAccess(StrictModel):
     )
 
 
-class TTSAggregatedProviderAccessSettings(StrictModel):
-    """Credentials per TTS provider (merged with higher-priority env/CLI sources)."""
-
-    aws: AWSProviderAccess | None = None
-
-
 class Text2SpeechSettings(StrictModel):
-    """Text-to-Speech configuration across languages and providers."""
+    """Text-to-Speech configuration."""
 
     languages: dict[str, LanguageTTSConfig] = Field(
         default_factory=dict,
         description="Mapping of language code to its TTS configuration.",
     )
-    providers: TTSAggregatedProviderAccessSettings | None = Field(
-        default=None,
-        description="TTS provider credentials; can be overridden by env/CLI.",
-    )
+
+
+class ProviderAccessSettings(StrictModel):
+    """Providers credentials."""
+
+    openai: OpenAIProviderAccess | None = None
+    aws: AWSProviderAccess | None = None
 
 
 class Settings(BaseSettings):
@@ -183,12 +170,17 @@ class Settings(BaseSettings):
 
     llm: LLMConfig = Field(
         default_factory=LLMConfig,
-        description="LLM configuration: provider, options, and credentials.",
+        description="LLM configuration.",
     )
 
     tts: Text2SpeechSettings = Field(
         default_factory=Text2SpeechSettings,
-        description="Text-to-Speech configuration for languages and provider credentials.",
+        description="Text-to-Speech configuration.",
+    )
+
+    providers: ProviderAccessSettings = Field(
+        default_factory=ProviderAccessSettings,
+        description="Provider credentials.",
     )
 
     @classmethod

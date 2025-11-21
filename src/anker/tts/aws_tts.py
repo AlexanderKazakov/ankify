@@ -49,11 +49,10 @@ class AWSPollySingleLanguageClient(TTSSingleLanguageClient):
             language_settings.voice_id, language_settings.engine,
         )
 
-        session_kwargs = {
-            "aws_access_key_id": access_settings.access_key_id.get_secret_value(),
-            "aws_secret_access_key": access_settings.secret_access_key.get_secret_value(),
-            "region_name": access_settings.region,
-        }
+        session_kwargs: dict[str, str] = {}
+        session_kwargs["aws_access_key_id"] = access_settings.access_key_id.get_secret_value()
+        session_kwargs["aws_secret_access_key"] = access_settings.secret_access_key.get_secret_value()
+        session_kwargs["region_name"] = access_settings.region
         session = boto3.Session(**session_kwargs)
         self._client: BaseClient = session.client("polly")
 
