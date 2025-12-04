@@ -11,13 +11,25 @@
             "python": "${workspaceFolder}/.venv/bin/python",
         },
         {
+            "name": "_test_openai_tts_ssml",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "anker.tts._test_openai_tts_ssml",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "python": "${workspaceFolder}/.venv/bin/python",
+        },
+        {
             "name": "dev_test",
             "type": "debugpy",
             "request": "launch",
             "module": "anker.cli",
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "args": ["--config", "${workspaceFolder}/settings/dev_test.yaml"],
+            "args": [
+                "--config",
+                "${workspaceFolder}/settings/dev_test.yaml"
+            ],
             "python": "${workspaceFolder}/.venv/bin/python"
         },
         {
@@ -27,7 +39,10 @@
             "module": "anker.cli",
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "args": ["--config", "${workspaceFolder}/settings/german2english.yaml"],
+            "args": [
+                "--config",
+                "${workspaceFolder}/settings/german2english.yaml"
+            ],
             "python": "${workspaceFolder}/.venv/bin/python"
         },
         {
@@ -37,9 +52,11 @@
             "module": "anker.cli",
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "args": ["--config", "${workspaceFolder}/settings/english_russian.yaml"],
+            "args": [
+                "--config",
+                "${workspaceFolder}/settings/english_russian.yaml"
+            ],
             "python": "${workspaceFolder}/.venv/bin/python"
         }
-
     ]
 }
