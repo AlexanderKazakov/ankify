@@ -7,9 +7,8 @@ from ..settings import LLMConfig, OpenAIProviderAccess
 class OpenAIClient(LLMClient):
     """Any OpenAI-compatible API"""
     def __init__(self, llm_config: LLMConfig, openai_access: OpenAIProviderAccess) -> None:
-        super().__init__()
+        super().__init__(llm_config.options.model)
         api_key = openai_access.api_key.get_secret_value()
-        self._model = llm_config.options.model
         self._reasoning_effort = llm_config.options.reasoning_effort
         self._client = openai.OpenAI(api_key=api_key, base_url=openai_access.base_url)
         endpoint = openai_access.base_url or "[OpenAI-default-endpoint]"
@@ -34,8 +33,4 @@ class OpenAIClient(LLMClient):
         response = self._client.chat.completions.create(**kwargs)
         self._logger.info("OpenAI API call completed")
 
-        usage = {
-            "model": self._model,
-            "usage": response.usage.to_dict(),
-        }
-        return response.choices[0].message.content, usage
+        return response.choices[0].message.content, response.usage
