@@ -1,7 +1,10 @@
+import json
 import os
 import re
+from importlib import resources
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Literal
 from uuid import uuid4
 
 from dotenv import load_dotenv
@@ -9,6 +12,7 @@ from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
 from ..anki.anki_deck_creator import AnkiDeckCreator
+from ..llm.jinja2_prompt_formatter import PromptRenderer
 from ..settings import AWSProviderAccess, NoteType, ProviderAccessSettings, Text2SpeechSettings
 from ..tsv import read_from_string
 from ..tts.tts_manager import TTSManager
@@ -45,6 +49,129 @@ else:
     logger.info("Using Edge TTS provider (as no AWS credentials found in env)")
 
 
+def _deck_prompt(note_type: NoteType | str, deck_name: str) -> str:
+    return f"""
+Create Anki deck from the vocabulary table with the note type: `{note_type}` and deck name: `{deck_name}`.
+Use the MCP tool `convert_TSV_to_Anki_deck` for this.
+If there are multiple vocabulary table versions in the chat, use the latest/actual/user-approved one.
+"""
+
+
+@ankify_mcp.prompt(
+        title="Create Anki Deck",
+        description="Prompt to create Anki deck file from the vocabulary table. "
+                "The note type is deduced by the LLM automatically. Use 'deck_fo' and 'deck_fb' prompts for explicit note type choices."
+                "The table has to be already present in the chat at the time of the prompt.",
+)
+def deck(
+        deck_name: str = "Ankify",
+) -> str:
+    basic_prompt = _deck_prompt(note_type='<choose it yourself intelligently>', deck_name=deck_name)
+    note_type_instructions = f"""
+Deduce the note type from the vocabulary table, the tool description, and the previous instructions.
+If you are not sure, ask the user for the exact note type, and mention that there are explicit prompt shortcuts: 'deck_fo' and 'deck_fb'.
+"""
+    return f"{basic_prompt}\n{note_type_instructions}"
+
+
+@ankify_mcp.prompt(
+        title="Create Anki Deck with Forward-Only notes",
+        description="Prompt to create Anki deck file with 'forward_only' notes from the vocabulary table. "
+                "The table has to be already present in the chat at the time of the prompt.",
+)
+def deck_fo(deck_name: str = "Ankify") -> str:
+    return _deck_prompt(note_type="forward_only", deck_name=deck_name)
+
+
+@ankify_mcp.prompt(
+        title="Create Anki Deck with Forward-and-Backward notes",
+        description="Prompt to create Anki deck file with 'forward_and_backward' notes from the vocabulary table. "
+                "The table has to be already present in the chat at the time of the prompt.",
+)
+def deck_fb(deck_name: str = "Ankify") -> str:
+    return _deck_prompt(note_type="forward_and_backward", deck_name=deck_name)
+
+
+def _resolve_language_alias(language: str) -> str:
+    language = language.lower()
+    # todo - all these configs (and tts manager) should be kept as singletons
+    aliases_content = resources.files("ankify.resources").joinpath("language_aliases.json").read_text(encoding="utf-8")
+    aliases: dict[str, str] = json.loads(aliases_content)
+    if language in aliases:
+        return aliases[language]
+    return language
+
+
+def _resolve_instructions_for_language(language: str) -> str:
+    instructions_path = resources.files("ankify.resources.prompts.language_specific").joinpath(f"{language.lower()}.md")
+    if instructions_path.is_file():
+        return instructions_path.read_text(encoding="utf-8")
+    return ""
+
+
+@ankify_mcp.prompt(
+        title="Create Vocabulary Table (universal parametrizable template)",
+        description="""
+Prompt to create vocabulary table in TSV format from the user input. 
+The universal template, to be parametrized with languages, note type, and additional custom instructions. 
+'language_a' is the language being studied, 'language_b' is the known language, any language is supported.
+
+Languages can be specified quite flexibly like "English", "en", "ENG", "GE", "ger", "Rus", "russian", "Turkish", etc.
+
+Note type can be specified quite flexibly like "fo" (forward only), "fb" (forward and backward), "forward only", "Forward and backward", "forward-only", "forward-and-backward", "forward_only", "forward_and_backward".
+""",
+)
+def vocab(
+        language_a: str = "language_a",
+        language_b: str = "language_b",
+        note_type: NoteType | str = "forward_and_backward",
+        custom_instructions: str = "",
+) -> str:
+    if note_type == "fo":
+        note_type = "forward_only"
+    elif note_type == "fb":
+        note_type = "forward_and_backward"
+    else:
+        note_type = note_type.lower().strip().replace(" ", "_").replace("-", "_")
+
+    if note_type not in ["forward_only", "forward_and_backward"]:
+        raise ValueError("Invalid note type")
+    
+    template_content = resources.files("ankify.resources.prompts").joinpath("mcp_prompt_template.md.j2").read_text(encoding="utf-8")
+    language_a = _resolve_language_alias(language_a)
+    language_b = _resolve_language_alias(language_b)
+    language_a_instructions = _resolve_instructions_for_language(language_a)
+    language_b_instructions = _resolve_instructions_for_language(language_b)
+
+    return PromptRenderer.render(
+        template_content=template_content,
+        context={
+            "language_a": language_a,
+            "language_b": language_b,
+            "note_type": note_type,
+            "language_a_instructions": language_a_instructions,
+            "language_b_instructions": language_b_instructions,
+            "custom_instructions": custom_instructions,
+        }
+    )
+
+
+@ankify_mcp.prompt(
+        title="Create Vocabulary Table (English-Russian, forward-only notes)",
+        description="Shortcut for 'vocab' with language_a='English', language_b='Russian', note_type='forward_only'",
+)
+def vocab_en_ru_fo() -> str:
+    return vocab(language_a="English", language_b="Russian", note_type="forward_only")
+
+
+@ankify_mcp.prompt(
+        title="Create Vocabulary Table (German-English, forward-and-backward notes)",
+        description="Shortcut for 'vocab' with language_a='German', language_b='English', note_type='forward_and_backward'",
+)
+def vocab_ge_en_fb() -> str:
+    return vocab(language_a="German", language_b="English", note_type="forward_and_backward")
+
+
 @ankify_mcp.tool()
 def convert_TSV_to_Anki_deck(
     tsv_vocabulary: str,
@@ -53,12 +180,16 @@ def convert_TSV_to_Anki_deck(
 ) -> str:
     """
     Creates Anki deck (.apkg) from TSV vocabulary (string).
+
+    Important:
+    - `tsv_vocabulary` - it supports only correctly formatted TSV strings!
+    - `note_type` - attention should be paid to the proper choice of it!
     
     Args:
         tsv_vocabulary: string with vocabulary in TSV format: 
             `front_text<tab>back_text<tab>front_language<tab>back_language<newline>...`
         
-        note_type: type of Anki notes to create: 
+        note_type: type of Anki notes to create, exactly one of: 
             - `forward_and_backward` - two cards per note: forward and backward
             - `forward_only` - one card per note: forward only
         
@@ -119,11 +250,24 @@ def package_anki_deck(
     return output_file
 
 
-def _test() -> None:
+def _test_vocab() -> None:
+    with open("tmp/vocab_en_ru_fo.md", "w") as f:
+        f.write(vocab_en_ru_fo())
+    with open("tmp/vocab_en_ru_fb.md", "w") as f:
+        f.write(vocab(language_a="en", language_b="ru", note_type="forward and backward", custom_instructions="Some custom instructions..."))
+    with open("tmp/vocab_ge_en_fb.md", "w") as f:
+        f.write(vocab_ge_en_fb())
+    with open("tmp/vocab_ge_en_fo.md", "w") as f:
+        f.write(vocab(language_a="de", language_b="eng", note_type="fo"))
+    with open("tmp/vocab_ar_tr_fb.md", "w") as f:
+        f.write(vocab(language_a="ar", language_b="tr", note_type="fb"))
+
+
+def _test_convert_TSV_to_Anki_deck() -> None:
     uri = convert_TSV_to_Anki_deck(
         tsv_vocabulary="""
-Hello World!\tHallo Welt!\tEnglish\tGerman
-Как дела?\t¿Cómo estás?\tRussian\tSpanish
+Hello World!\tHallo Welt!\tEng\tGe
+Как дела?\t¿Cómo estás?\tRus\tSpanish
 كم تبلغ من العمر؟\t你今年多大\tArabic\tChinese
 """,
         note_type="forward_and_backward",
@@ -133,6 +277,7 @@ Hello World!\tHallo Welt!\tEnglish\tGerman
 
 
 if __name__ == "__main__":
-    # _test()
+    # _test_vocab()
+    # _test_convert_TSV_to_Anki_deck()
     ankify_mcp.run(transport="stdio")
 

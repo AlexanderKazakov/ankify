@@ -1,0 +1,97 @@
+# The task
+
+Based on the provided input, create a high-quality vocabulary table to be used for learning in Anki - the application for words memorization.
+
+The current task is just to create the table and output it in your answer, do not try to create an Anki deck or anything else yet.
+
+
+# Detailed instructions
+
+The table must be in TSV format: cells in a table row are separated by the `\t` symbol and rows are separated by the `\n` symbol. Put it into your answer as a single block:
+```
+...
+```
+
+Alternatively, if (and only if) you have any other better tools to present the table in a readable and editable format, use them.
+
+The order of words is not important. It is not necessary to put them in alphabetical order. The best approach is to list words and phrases as you encounter them in the provided text. But avoid exact duplicates (group the translations if you find several of the same word or phrase).
+
+The purpose of this dictionary is to be used in the Anki app to memorize translations. The dictionary should contain words, short fixed phrases, and useful sentence constructions if there are any in the provided text.
+
+Never use any abbreviations, such as 'sth.', 'smb.', 'напр.', 'что-л.', 'т.п.', 'тех.', 'поэтич.', 'tech.', 'etw.', 'Dat.'! Always write whole words in the language of the phrase, like 'something', 'somebody', 'например', 'что-либо', 'тому подобное', 'etwas', 'Dativ', etc.
+
+**You must never mix languages within a single cell.** Never, even when it seems convenient for clarifying a translation. Only one language within a cell!
+
+Think deeply about every translation. If there are several synonyms, slightly enrich their translations so that it's clear how they differ. If a translation has a very broad meaning, extend it a little to make it more precise. But overall, keep translations concise. This is not a thesaurus, but a vocabulary dictionary for learning. You have to choose clear, precise, concise, and common translations. Do not write five same synonyms for a word, choose only a couple best ones. Maintain the adequate balance between conciseness and precision! This is a hard task, think deeply on each table row!
+
+Verbs must always be in the infinitive form unless they are part of a fixed phrase where they are conjugated. Whenever possible, include the corresponding preposition along with a verb, for example, "to speak about" is better than just "to speak". 
+
+Maintain translation consistency: an infinitive must be translated to an infinitive, a fixed phrase must be translated to a fixed phrase, etc.
+
+Note that the user input may contain orthographical mistakes, or incorrect/not fully correct/incomplete translations, or no translations at all. You must fix all such cases.
+
+Separate synonyms with commas. Separate different translations of the same word with semicolons.
+
+Every row in the output has exactly 4 cells: a word or phrase in the 1st column, its translation in the 2nd column, and the language labels in the 3rd and 4th columns.
+
+{% if note_type == "forward_and_backward" %}
+
+The dictionary is one-way. All the cells in the 1st column are in {{ language_a }}, and all the cells in the 2nd column are in {{ language_b }}. The 3rd column is always `{{ language_a }}`, and the 4th column is always `{{ language_b }}`.
+The output format is:
+```
+{{ language_a }} word	its {{ language_b }} translation	{{ language_a }}	{{ language_b }}
+another {{ language_a }} word	another {{ language_b }} translation	{{ language_a }}	{{ language_b }}
+...
+```
+
+Imagine yourself learning this table in the following way: given a word from the 1st column, you need to recall its translation from the 2nd column, and vice versa: given a word from the 2nd column, you need to recall its translation from the 1st column. Keep that in mind when you decide on the translation and phrasing!
+
+For example, if we were building an English-Russian vocabulary just for the single verb 'to contend with':
+That would be a very bad result:
+```
+to contend with something	бороться с чем-либо	English	Russian
+```
+-- because nobody by default translates 'бороться' to 'contend', and rarely vice-versa. You must extend these translations to make them more precise.
+That would be a proper result:
+```
+to contend with something	сталкиваться, иметь дело, бороться с чем-либо	English	Russian
+```
+
+{% elif note_type == "forward_only" %}
+
+The dictionary is two-way. The pairs "{{ language_a }} -> {{ language_b }}" are interleaved with "{{ language_b }} -> {{ language_a }}" pairs.
+The output format is:
+```
+{{ language_a }} word	its {{ language_b }} translation	{{ language_a }}	{{ language_b }}
+its {{ language_b }} translation	{{ language_a }} word	{{ language_b }}	{{ language_a }}
+another {{ language_a }} word	another {{ language_b }} translation	{{ language_a }}	{{ language_b }}
+another {{ language_b }} translation	another {{ language_a }} word	{{ language_b }}	{{ language_a }}
+...
+```
+
+In general, "{{ language_b }} -> {{ language_a }}" pairs should just repeat the "{{ language_a }} -> {{ language_b }}" pairs in the reverse order, but sometimes you should adjust, extend, or even split a row into several rows to make the Anki card clearer. Imagine yourself learning this table in the following way: given a word from the 1st column, you need to recall its translation from the 2nd column. And sometimes translation in one direction is good, but in the opposite direction, it is awkward. Then, you need to adjust or extend the first column, or even split the row into a couple of separate ones. The ultimate goal is to create a meaningful table for learning the 2nd column given the 1st column, not just duplicate every row swapping the cells. Keep that in mind when you decide on the translation and phrasing!
+
+For example, if we were building an English-Russian vocabulary just for the single verb 'to contend with':
+That would be a very bad result:
+```
+to contend with something	бороться с чем-либо	English	Russian
+бороться с чем-либо	to contend with something	Russian	English
+```
+-- because nobody by default translates 'бороться' to 'contend', and rarely vice-versa. You must extend these translations to make them more precise.
+That would be a proper result:
+```
+to contend with something	сталкиваться, иметь дело, бороться с чем-либо	English	Russian
+сталкиваться, иметь дело, бороться с чем-либо	to contend with something	Russian	English
+```
+
+{% else %}
+{% set _ = fail('Invalid note type: `' ~ note_type ~ '`') %}
+{% endif %}
+
+{{ language_a_instructions }}
+
+{{ language_b_instructions }}
+
+{{ custom_instructions }}
+
+---

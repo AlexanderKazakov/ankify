@@ -14,13 +14,11 @@ class DefaultTTSConfigurator:
 
     def _load_defaults(self, provider: str) -> dict[str, str | dict[str, str]]:
         filename = f"tts_defaults_{provider}.json"
-        content = resources.files("ankify.resources").joinpath(
-            filename).read_text(encoding="utf-8")
+        content = resources.files("ankify.resources.tts").joinpath(filename).read_text(encoding="utf-8")
         defaults: dict[str, str | dict[str, str]] = json.loads(content)
         logger.debug("Loaded %s default voice codes for provider '%s'.", len(defaults), provider)
 
-        aliases_content = resources.files("ankify.resources").joinpath(
-            "tts_language_aliases.json").read_text(encoding="utf-8")
+        aliases_content = resources.files("ankify.resources").joinpath("language_aliases.json").read_text(encoding="utf-8")
         aliases: dict[str, str] = json.loads(aliases_content)
         added_aliases = {}
         for alias, target in aliases.items():
