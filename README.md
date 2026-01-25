@@ -132,13 +132,3 @@ train platform  der Bahnsteig   English German
 ```
 
 The 3rd and 4th columns (language labels) are important for text-to-speech in both cases.
-
-## TODO
-
-- [ ] images support
-- [ ] run text-to-speech in batches
-- [ ] work with LLM via structured json output, not tsv; but prompt writing needs to be re-thought then
-- [ ] tests / actions
-- [ ] re-think AWS login (SSL instead of keys)
-- [ ] make an Anki extension based on this code
-- [ ] or try [anki-connect](https://git.sr.ht/~foosoft/anki-connect) for a direct automatic loading to Anki
