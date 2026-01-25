@@ -1,4 +1,26 @@
-# Ankify: raw text to Anki vocabulary deck with speech
+# Ankify: MCP and CLI for Anki decks with TTS speech
+
+## MCP
+Local stdio MCP -- automatic creation of .apkg Anki decks with added TTS speech + carefully tweaked prompt templates for vocabulary creation for any pair of languages.
+```
+{
+  "mcpServers": {
+    "ankify": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/path/to/ankify",
+        "run",
+        "python",
+        "-m",
+        "ankify.mcp.ankify_mcp_server"
+      ]
+    }
+  }
+}
+```
+
+## CLI
 
 A Python command-line application that
 
