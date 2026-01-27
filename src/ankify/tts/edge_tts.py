@@ -4,7 +4,6 @@ from typing import Awaitable, Callable, TYPE_CHECKING
 from xml.sax.saxutils import escape as xml_escape
 
 import aiohttp
-import edge_tts
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from ..logging import get_logger
@@ -97,6 +96,9 @@ class EdgeTTSSingleLanguageClient(TTSSingleLanguageClient):
         return self._run_coroutine(lambda: self._synthesize_single_async(prepared_text))
 
     async def _synthesize_single_async(self, text: str) -> bytes:
+        # Lazy import to avoid asyncio conflicts at module load time in FastMCP cloud
+        import edge_tts
+        
         self.logger.debug(
             "Calling Edge TTS: voice=%s text=%s", self._language_settings.voice_id, text
         )

@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import re
@@ -184,7 +183,7 @@ def vocab_ge_en_fb() -> str:
 
 
 @mcp.tool()
-async def convert_TSV_to_Anki_deck(
+def convert_TSV_to_Anki_deck(
     tsv_vocabulary: str,
     note_type: NoteType,
     deck_name: str = "Ankify",
@@ -211,24 +210,18 @@ async def convert_TSV_to_Anki_deck(
     """
     logger.info("Received request to create deck '%s' with note_type '%s'", deck_name, note_type)
     
-    def _create_deck_sync() -> str:
-        """Synchronous deck creation to run in a separate thread."""
-        try:
-            vocab_entries: list[VocabEntry] = read_from_string(tsv_vocabulary)
-        except Exception as e:
-            msg = f"Failed to parse vocabulary TSV: {e}"
-            logger.error(msg)
-            raise ValueError(msg)
+    try:
+        vocab_entries: list[VocabEntry] = read_from_string(tsv_vocabulary)
+    except Exception as e:
+        msg = f"Failed to parse vocabulary TSV: {e}"
+        logger.error(msg)
+        raise ValueError(msg)
 
-        with TemporaryDirectory(dir=decks_directory, prefix="media_") as audio_dir:
-            synthesize_audio(vocab_entries, Path(audio_dir))
-            output_file = package_anki_deck(vocab_entries, decks_directory, deck_name, note_type)
-            
-        return output_file.resolve().as_uri()
-    
-    # Run all blocking I/O (TTS synthesis, file operations) in a separate thread
-    # to avoid asyncio event loop conflicts in FastMCP cloud environment
-    return await asyncio.to_thread(_create_deck_sync)
+    with TemporaryDirectory(dir=decks_directory, prefix="media_") as audio_dir:
+        synthesize_audio(vocab_entries, Path(audio_dir))
+        output_file = package_anki_deck(vocab_entries, decks_directory, deck_name, note_type)
+        
+    return output_file.resolve().as_uri()
 
 
 def synthesize_audio(vocab_entries: list[VocabEntry], audio_dir: Path) -> None:
