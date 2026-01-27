@@ -2,7 +2,7 @@
     "$schema": "https://gofastmcp.com/public/schemas/fastmcp.json/v1.json",
     "source": {
         "path": "src/ankify/mcp/ankify_mcp_server.py",
-        "entrypoint": "ankify_mcp"
+        "entrypoint": "mcp"
     },
     "environment": {
         "python": ">=3.11",

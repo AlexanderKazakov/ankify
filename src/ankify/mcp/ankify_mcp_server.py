@@ -21,7 +21,7 @@ from ankify.logging import get_logger
 
 logger = get_logger(__name__)
 
-ankify_mcp = FastMCP("Ankify")
+mcp = FastMCP("Ankify")
 
 load_dotenv()
 
@@ -67,7 +67,7 @@ If there are multiple vocabulary table versions in the chat, use the latest/actu
 """
 
 
-@ankify_mcp.prompt(
+@mcp.prompt(
         title="Create Anki Deck",
         description="Prompt to create Anki deck file from the vocabulary table. "
                 "The note type is deduced by the LLM automatically. Use 'deck_fo' and 'deck_fb' prompts for explicit note type choices."
@@ -84,7 +84,7 @@ If you are not sure, ask the user for the exact note type, and mention that ther
     return f"{basic_prompt}\n{note_type_instructions}"
 
 
-@ankify_mcp.prompt(
+@mcp.prompt(
         title="Create Anki Deck with Forward-Only notes",
         description="Prompt to create Anki deck file with 'forward_only' notes from the vocabulary table. "
                 "The table has to be already present in the chat at the time of the prompt.",
@@ -93,7 +93,7 @@ def deck_fo(deck_name: str = "Ankify") -> str:
     return _deck_prompt(note_type="forward_only", deck_name=deck_name)
 
 
-@ankify_mcp.prompt(
+@mcp.prompt(
         title="Create Anki Deck with Forward-and-Backward notes",
         description="Prompt to create Anki deck file with 'forward_and_backward' notes from the vocabulary table. "
                 "The table has to be already present in the chat at the time of the prompt.",
@@ -119,7 +119,7 @@ def _resolve_instructions_for_language(language: str) -> str:
     return ""
 
 
-@ankify_mcp.prompt(
+@mcp.prompt(
         title="Create Vocabulary Table (universal parametrizable template)",
         description="""
 Prompt to create vocabulary table in TSV format from the user input. 
@@ -166,7 +166,7 @@ def vocab(
     )
 
 
-@ankify_mcp.prompt(
+@mcp.prompt(
         title="Create Vocabulary Table (English-Russian, forward-only notes)",
         description="Shortcut for 'vocab' with language_a='English', language_b='Russian', note_type='forward_only'",
 )
@@ -174,7 +174,7 @@ def vocab_en_ru_fo() -> str:
     return vocab(language_a="English", language_b="Russian", note_type="forward_only")
 
 
-@ankify_mcp.prompt(
+@mcp.prompt(
         title="Create Vocabulary Table (German-English, forward-and-backward notes)",
         description="Shortcut for 'vocab' with language_a='German', language_b='English', note_type='forward_and_backward'",
 )
@@ -182,7 +182,7 @@ def vocab_ge_en_fb() -> str:
     return vocab(language_a="German", language_b="English", note_type="forward_and_backward")
 
 
-@ankify_mcp.tool()
+@mcp.tool()
 def convert_TSV_to_Anki_deck(
     tsv_vocabulary: str,
     note_type: NoteType,
@@ -289,5 +289,5 @@ Hello World!\tHallo Welt!\tEng\tGe
 if __name__ == "__main__":
     # _test_vocab()
     # _test_convert_TSV_to_Anki_deck()
-    ankify_mcp.run(transport="stdio")
+    mcp.run(transport="stdio")
 
