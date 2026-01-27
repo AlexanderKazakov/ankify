@@ -1,6 +1,6 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, TYPE_CHECKING
 from xml.sax.saxutils import escape as xml_escape
 
 import aiohttp
@@ -10,6 +10,9 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 from ..logging import get_logger
 from ..settings import TTSVoiceOptions
 from .tts_base import TTSSingleLanguageClient
+
+if TYPE_CHECKING:
+    from .tts_cost_tracker import TTSCostTracker
 
 
 class EdgeTTSSingleLanguageClient(TTSSingleLanguageClient):
@@ -46,7 +49,12 @@ class EdgeTTSSingleLanguageClient(TTSSingleLanguageClient):
         )
         self._language_settings = language_settings
 
-    def synthesize(self, entities: dict[str, bytes | None]) -> None:
+    def synthesize(
+        self,
+        entities: dict[str, bytes | None],
+        language: str,
+        cost_tracker: "TTSCostTracker | None" = None,
+    ) -> None:
         self.logger.info(
             "Synthesizing speech for %d entities, voice id '%s'",
             len(entities),
@@ -55,6 +63,8 @@ class EdgeTTSSingleLanguageClient(TTSSingleLanguageClient):
 
         for text in entities:
             entities[text] = self._synthesize_single(text)
+            if cost_tracker:
+                cost_tracker.track_usage(text, "free", language)
 
     def _run_coroutine(self, coro_factory: Callable[[], Awaitable[bytes]]) -> bytes:
         try:

@@ -77,7 +77,7 @@ class TTSVoiceOptions(StrictModel):
     )
 
 
-TTSProvider = Literal["aws", "edge"]
+TTSProvider = Literal["aws", "azure", "edge"]
 
 
 class LanguageTTSConfig(StrictModel):
@@ -107,6 +107,19 @@ class AWSProviderAccess(StrictModel):
     )
 
 
+class AzureProviderAccess(StrictModel):
+    """Azure credentials for TTS (Cognitive Services Speech)."""
+
+    subscription_key: SecretStr | None = Field(
+        default=None,
+        description="Azure Cognitive Services subscription key. Can be provided via env",
+    )
+    region: str | None = Field(
+        default=None,
+        description="Azure region (e.g., eastus, westeurope) for the TTS service.",
+    )
+
+
 class Text2SpeechSettings(StrictModel):
     """Text-to-Speech configuration."""
     default_provider: TTSProvider = Field(
@@ -125,6 +138,7 @@ class ProviderAccessSettings(StrictModel):
 
     openai: OpenAIProviderAccess | None = None
     aws: AWSProviderAccess | None = None
+    azure: AzureProviderAccess | None = None
 
 
 class MLflowConfig(StrictModel):

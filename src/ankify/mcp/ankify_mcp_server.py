@@ -4,7 +4,6 @@ import re
 from importlib import resources
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Literal
 from uuid import uuid4
 
 from dotenv import load_dotenv
@@ -13,7 +12,7 @@ from mcp.server.fastmcp import FastMCP
 
 from ..anki.anki_deck_creator import AnkiDeckCreator
 from ..llm.jinja2_prompt_formatter import PromptRenderer
-from ..settings import AWSProviderAccess, NoteType, ProviderAccessSettings, Text2SpeechSettings
+from ..settings import AWSProviderAccess, AzureProviderAccess, NoteType, ProviderAccessSettings, Text2SpeechSettings
 from ..tsv import read_from_string
 from ..tts.tts_manager import TTSManager
 from ..vocab_entry import VocabEntry
@@ -29,7 +28,18 @@ load_dotenv()
 decks_directory = Path("~/ankify").expanduser().resolve()
 decks_directory.mkdir(parents=True, exist_ok=True)
 
-if os.getenv("ANKIFY__PROVIDERS__AWS__ACCESS_KEY_ID"):
+if os.getenv("ANKIFY__PROVIDERS__AZURE__SUBSCRIPTION_KEY"):
+    tts_settings = Text2SpeechSettings(
+        default_provider="azure",
+    )
+    provider_settings = ProviderAccessSettings(
+        azure=AzureProviderAccess(
+            subscription_key=os.getenv("ANKIFY__PROVIDERS__AZURE__SUBSCRIPTION_KEY"),
+            region=os.getenv("ANKIFY__PROVIDERS__AZURE__REGION"),
+        ),
+    )
+    logger.info("Using Azure TTS provider: %s", provider_settings.azure)
+elif os.getenv("ANKIFY__PROVIDERS__AWS__ACCESS_KEY_ID"):
     tts_settings = Text2SpeechSettings(
         default_provider="aws",
     )

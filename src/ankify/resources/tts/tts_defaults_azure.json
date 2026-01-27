@@ -1,0 +1,434 @@
+{
+    "afrikaans": {
+        "voice_id": "af-ZA-WillemNeural"
+    },
+    "amharic": {
+        "voice_id": "am-ET-AmehaNeural"
+    },
+    "arabic": {
+        "voice_id": "ar-SA-HamedNeural"
+    },
+    "arabic_algerian": {
+        "voice_id": "ar-DZ-IsmaelNeural"
+    },
+    "arabic_bahraini": {
+        "voice_id": "ar-BH-AliNeural"
+    },
+    "arabic_egyptian": {
+        "voice_id": "ar-EG-ShakirNeural"
+    },
+    "arabic_gulf": {
+        "voice_id": "ar-AE-HamdanNeural"
+    },
+    "arabic_iraqi": {
+        "voice_id": "ar-IQ-BasselNeural"
+    },
+    "arabic_jordanian": {
+        "voice_id": "ar-JO-TaimNeural"
+    },
+    "arabic_kuwaiti": {
+        "voice_id": "ar-KW-FahedNeural"
+    },
+    "arabic_lebanese": {
+        "voice_id": "ar-LB-RamiNeural"
+    },
+    "arabic_libyan": {
+        "voice_id": "ar-LY-OmarNeural"
+    },
+    "arabic_moroccan": {
+        "voice_id": "ar-MA-JamalNeural"
+    },
+    "arabic_omani": {
+        "voice_id": "ar-OM-AbdullahNeural"
+    },
+    "arabic_qatari": {
+        "voice_id": "ar-QA-MoazNeural"
+    },
+    "arabic_syrian": {
+        "voice_id": "ar-SY-LaithNeural"
+    },
+    "arabic_tunisian": {
+        "voice_id": "ar-TN-HediNeural"
+    },
+    "arabic_yemeni": {
+        "voice_id": "ar-YE-SalehNeural"
+    },
+    "azerbaijani": {
+        "voice_id": "az-AZ-BabekNeural"
+    },
+    "bulgarian": {
+        "voice_id": "bg-BG-BorislavNeural"
+    },
+    "bangla": {
+        "voice_id": "bn-BD-NabanitaNeural"
+    },
+    "bengali": {
+        "voice_id": "bn-IN-BashkarNeural"
+    },
+    "bosnian": {
+        "voice_id": "bs-BA-GoranNeural"
+    },
+    "catalan": {
+        "voice_id": "ca-ES-EnricNeural"
+    },
+    "czech": {
+        "voice_id": "cs-CZ-AntoninNeural"
+    },
+    "welsh": {
+        "voice_id": "cy-GB-AledNeural"
+    },
+    "danish": {
+        "voice_id": "da-DK-JeppeNeural"
+    },
+    "german": {
+        "voice_id": "de-DE-ConradNeural"
+    },
+    "german_austrian": {
+        "voice_id": "de-AT-JonasNeural"
+    },
+    "german_swiss": {
+        "voice_id": "de-CH-JanNeural"
+    },
+    "greek": {
+        "voice_id": "el-GR-NestorasNeural"
+    },
+    "english": {
+        "voice_id": "en-US-GuyNeural"
+    },
+    "english_australian": {
+        "voice_id": "en-AU-WilliamNeural"
+    },
+    "english_british": {
+        "voice_id": "en-GB-RyanNeural"
+    },
+    "english_canadian": {
+        "voice_id": "en-CA-LiamNeural"
+    },
+    "english_hongkong": {
+        "voice_id": "en-HK-SamNeural"
+    },
+    "english_indian": {
+        "voice_id": "en-IN-PrabhatNeural"
+    },
+    "english_ireland": {
+        "voice_id": "en-IE-ConnorNeural"
+    },
+    "english_kenyan": {
+        "voice_id": "en-KE-ChilembaNeural"
+    },
+    "english_new_zealand": {
+        "voice_id": "en-NZ-MitchellNeural"
+    },
+    "english_nigerian": {
+        "voice_id": "en-NG-AbeoNeural"
+    },
+    "english_philippine": {
+        "voice_id": "en-PH-JamesNeural"
+    },
+    "english_singaporean": {
+        "voice_id": "en-SG-WayneNeural"
+    },
+    "english_south_african": {
+        "voice_id": "en-ZA-LukeNeural"
+    },
+    "english_tanzanian": {
+        "voice_id": "en-TZ-ElimuNeural"
+    },
+    "english_us": {
+        "voice_id": "en-US-GuyNeural"
+    },
+    "spanish": {
+        "voice_id": "es-ES-AlvaroNeural"
+    },
+    "spanish_argentinian": {
+        "voice_id": "es-AR-TomasNeural"
+    },
+    "spanish_bolivian": {
+        "voice_id": "es-BO-MarceloNeural"
+    },
+    "spanish_chilean": {
+        "voice_id": "es-CL-LorenzoNeural"
+    },
+    "spanish_colombian": {
+        "voice_id": "es-CO-GonzaloNeural"
+    },
+    "spanish_costarican": {
+        "voice_id": "es-CR-JuanNeural"
+    },
+    "spanish_cuban": {
+        "voice_id": "es-CU-ManuelNeural"
+    },
+    "spanish_dominican": {
+        "voice_id": "es-DO-EmilioNeural"
+    },
+    "spanish_ecuadorian": {
+        "voice_id": "es-EC-LuisNeural"
+    },
+    "spanish_salvadoran": {
+        "voice_id": "es-SV-RodrigoNeural"
+    },
+    "spanish_equatoguinean": {
+        "voice_id": "es-GQ-JavierNeural"
+    },
+    "spanish_guatemalan": {
+        "voice_id": "es-GT-AndresNeural"
+    },
+    "spanish_honduran": {
+        "voice_id": "es-HN-CarlosNeural"
+    },
+    "spanish_mexican": {
+        "voice_id": "es-MX-JorgeNeural"
+    },
+    "spanish_nicaraguan": {
+        "voice_id": "es-NI-FedericoNeural"
+    },
+    "spanish_panamanian": {
+        "voice_id": "es-PA-RobertoNeural"
+    },
+    "spanish_peruvian": {
+        "voice_id": "es-PE-AlexNeural"
+    },
+    "spanish_puerto_rican": {
+        "voice_id": "es-PR-VictorNeural"
+    },
+    "spanish_paraguayan": {
+        "voice_id": "es-PY-MarioNeural"
+    },
+    "spanish_uruguayan": {
+        "voice_id": "es-UY-MateoNeural"
+    },
+    "spanish_us": {
+        "voice_id": "es-US-AlonsoNeural"
+    },
+    "spanish_venezuelan": {
+        "voice_id": "es-VE-SebastianNeural"
+    },
+    "estonian": {
+        "voice_id": "et-EE-KertNeural"
+    },
+    "basque": {
+        "voice_id": "eu-ES-AnderNeural"
+    },
+    "persian": {
+        "voice_id": "fa-IR-FaridNeural"
+    },
+    "finnish": {
+        "voice_id": "fi-FI-HarriNeural"
+    },
+    "filipino": {
+        "voice_id": "fil-PH-AngeloNeural"
+    },
+    "french": {
+        "voice_id": "fr-FR-HenriNeural"
+    },
+    "french_belgian": {
+        "voice_id": "fr-BE-GerardNeural"
+    },
+    "french_canadian": {
+        "voice_id": "fr-CA-AntoineNeural"
+    },
+    "french_swiss": {
+        "voice_id": "fr-CH-FabriceNeural"
+    },
+    "irish": {
+        "voice_id": "ga-IE-ColmNeural"
+    },
+    "galician": {
+        "voice_id": "gl-ES-RoiNeural"
+    },
+    "gujarati": {
+        "voice_id": "gu-IN-NiranjanNeural"
+    },
+    "hebrew": {
+        "voice_id": "he-IL-AvriNeural"
+    },
+    "hindi": {
+        "voice_id": "hi-IN-MadhurNeural"
+    },
+    "croatian": {
+        "voice_id": "hr-HR-SreckoNeural"
+    },
+    "hungarian": {
+        "voice_id": "hu-HU-TamasNeural"
+    },
+    "armenian": {
+        "voice_id": "hy-AM-HaykNeural"
+    },
+    "indonesian": {
+        "voice_id": "id-ID-ArdiNeural"
+    },
+    "icelandic": {
+        "voice_id": "is-IS-GunnarNeural"
+    },
+    "italian": {
+        "voice_id": "it-IT-DiegoNeural"
+    },
+    "inuktitut": {
+        "voice_id": "iu-Latn-CA-TaqqiqNeural"
+    },
+    "japanese": {
+        "voice_id": "ja-JP-KeitaNeural"
+    },
+    "javanese": {
+        "voice_id": "jv-ID-DimasNeural"
+    },
+    "georgian": {
+        "voice_id": "ka-GE-GiorgiNeural"
+    },
+    "kazakh": {
+        "voice_id": "kk-KZ-DauletNeural"
+    },
+    "khmer": {
+        "voice_id": "km-KH-PisethNeural"
+    },
+    "kannada": {
+        "voice_id": "kn-IN-GaganNeural"
+    },
+    "korean": {
+        "voice_id": "ko-KR-InJoonNeural"
+    },
+    "lao": {
+        "voice_id": "lo-LA-ChanthavongNeural"
+    },
+    "lithuanian": {
+        "voice_id": "lt-LT-LeonasNeural"
+    },
+    "latvian": {
+        "voice_id": "lv-LV-NilsNeural"
+    },
+    "macedonian": {
+        "voice_id": "mk-MK-AleksandarNeural"
+    },
+    "malayalam": {
+        "voice_id": "ml-IN-MidhunNeural"
+    },
+    "mongolian": {
+        "voice_id": "mn-MN-BataaNeural"
+    },
+    "marathi": {
+        "voice_id": "mr-IN-ManoharNeural"
+    },
+    "malay": {
+        "voice_id": "ms-MY-OsmanNeural"
+    },
+    "maltese": {
+        "voice_id": "mt-MT-JosephNeural"
+    },
+    "burmese": {
+        "voice_id": "my-MM-ThihaNeural"
+    },
+    "norwegian": {
+        "voice_id": "nb-NO-FinnNeural"
+    },
+    "nepali": {
+        "voice_id": "ne-NP-SagarNeural"
+    },
+    "dutch": {
+        "voice_id": "nl-NL-MaartenNeural"
+    },
+    "dutch_belgian": {
+        "voice_id": "nl-BE-ArnaudNeural"
+    },
+    "polish": {
+        "voice_id": "pl-PL-MarekNeural"
+    },
+    "pashto": {
+        "voice_id": "ps-AF-GulNawazNeural"
+    },
+    "portuguese": {
+        "voice_id": "pt-BR-AntonioNeural"
+    },
+    "portuguese_european": {
+        "voice_id": "pt-PT-DuarteNeural"
+    },
+    "romanian": {
+        "voice_id": "ro-RO-EmilNeural"
+    },
+    "russian": {
+        "voice_id": "ru-RU-DmitryNeural"
+    },
+    "sinhala": {
+        "voice_id": "si-LK-SameeraNeural"
+    },
+    "slovak": {
+        "voice_id": "sk-SK-LukasNeural"
+    },
+    "slovenian": {
+        "voice_id": "sl-SI-RokNeural"
+    },
+    "somali": {
+        "voice_id": "so-SO-MuuseNeural"
+    },
+    "albanian": {
+        "voice_id": "sq-AL-IlirNeural"
+    },
+    "serbian": {
+        "voice_id": "sr-RS-NicholasNeural"
+    },
+    "sundanese": {
+        "voice_id": "su-ID-JajangNeural"
+    },
+    "swedish": {
+        "voice_id": "sv-SE-MattiasNeural"
+    },
+    "swahili": {
+        "voice_id": "sw-KE-RafikiNeural"
+    },
+    "swahili_tanzanian": {
+        "voice_id": "sw-TZ-DaudiNeural"
+    },
+    "tamil": {
+        "voice_id": "ta-IN-ValluvarNeural"
+    },
+    "tamil_malaysian": {
+        "voice_id": "ta-MY-SuryaNeural"
+    },
+    "tamil_singaporean": {
+        "voice_id": "ta-SG-AnbuNeural"
+    },
+    "tamil_sri_lankan": {
+        "voice_id": "ta-LK-KumarNeural"
+    },
+    "telugu": {
+        "voice_id": "te-IN-MohanNeural"
+    },
+    "thai": {
+        "voice_id": "th-TH-NiwatNeural"
+    },
+    "turkish": {
+        "voice_id": "tr-TR-AhmetNeural"
+    },
+    "ukrainian": {
+        "voice_id": "uk-UA-OstapNeural"
+    },
+    "urdu": {
+        "voice_id": "ur-PK-AsadNeural"
+    },
+    "urdu_indian": {
+        "voice_id": "ur-IN-SalmanNeural"
+    },
+    "uzbek": {
+        "voice_id": "uz-UZ-SardorNeural"
+    },
+    "vietnamese": {
+        "voice_id": "vi-VN-NamMinhNeural"
+    },
+    "chinese": {
+        "voice_id": "zh-CN-YunxiNeural"
+    },
+    "chinese_northeastern": {
+        "voice_id": "zh-CN-liaoning-XiaobeiNeural"
+    },
+    "chinese_central": {
+        "voice_id": "zh-CN-shaanxi-XiaoniNeural"
+    },
+    "cantonese": {
+        "voice_id": "zh-HK-WanLungNeural"
+    },
+    "taiwanese": {
+        "voice_id": "zh-TW-YunJheNeural"
+    },
+    "zulu": {
+        "voice_id": "zu-ZA-ThembaNeural"
+    }
+}

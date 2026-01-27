@@ -8,6 +8,7 @@ from xml.sax.saxutils import escape as xml_escape
 from ..logging import get_logger
 from ..settings import TTSVoiceOptions, AWSProviderAccess
 from .tts_base import TTSSingleLanguageClient
+from .tts_cost_tracker import TTSCostTracker
 
 
 class AWSPollySingleLanguageClient(TTSSingleLanguageClient):
@@ -58,7 +59,12 @@ class AWSPollySingleLanguageClient(TTSSingleLanguageClient):
 
         self._language_settings = language_settings
     
-    def synthesize(self, entities: dict[str, bytes | None]) -> None:
+    def synthesize(
+        self,
+        entities: dict[str, bytes | None],
+        language: str,
+        cost_tracker: TTSCostTracker | None = None,
+    ) -> None:
         self.logger.info(
             "Synthesizing speech for %d entities, voice id '%s', engine '%s'",
             len(entities), self._language_settings.voice_id, self._language_settings.engine,
@@ -66,7 +72,7 @@ class AWSPollySingleLanguageClient(TTSSingleLanguageClient):
 
         # TODO: batching
         for text in entities:
-            entities[text] = self._synthesize_single(text)
+            entities[text] = self._synthesize_single(text, language, cost_tracker)
 
     @retry(
         reraise=True,
@@ -74,7 +80,7 @@ class AWSPollySingleLanguageClient(TTSSingleLanguageClient):
         wait=wait_exponential(),
         retry=retry_if_exception_type((BotoCoreError, ClientError)),
     )
-    def _synthesize_single(self, text: str) -> bytes:
+    def _synthesize_single(self, text: str, language: str, cost_tracker: TTSCostTracker | None) -> bytes:
         params = self.possibly_preprocess_text_into_ssml(text)
         response = self._client.synthesize_speech(
             **params,
@@ -82,6 +88,8 @@ class AWSPollySingleLanguageClient(TTSSingleLanguageClient):
             VoiceId=self._language_settings.voice_id,
             Engine=self._language_settings.engine,
         )
+        if cost_tracker:
+            cost_tracker.track_usage(text, self._language_settings.engine, language)
 
         if "AudioStream" not in response or response["AudioStream"] is None:
             self.logger.error(

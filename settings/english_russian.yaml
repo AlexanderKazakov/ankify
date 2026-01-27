@@ -27,11 +27,11 @@ note_type: forward_only
 llm:
   provider: openai
   options:
-    model: claude-4.5-sonnet
+    model: claude-4.5-opus
     reasoning_effort: high
     prompt_template: ./settings/prompts/prompt_template.md.j2
     custom_instructions: ./settings/prompts/custom_instructions/english_russian_c1.md
     few_shot_examples: ./settings/prompts/few_shot_examples/forward_only_english_russian_c1
-
-tts:
-  default_provider: aws
+# tts:
+# default_provider: aws
+# default_provider: azure

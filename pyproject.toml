@@ -22,6 +22,7 @@ dependencies = [
     "rich",
     "jinja2",
     "mcp",
+    "azure-cognitiveservices-speech",
 ]
 
 [project.optional-dependencies]
