@@ -11,28 +11,31 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "openai",
-    "boto3",
-    "edge-tts",
+    # Core - always needed
     "genanki",
     "pydantic",
     "pydantic-settings",
     "tenacity",
     "python-dotenv",
-    "pyyaml",
-    "rich",
     "jinja2",
     "mcp",
+    # Default TTS for FastMCP Cloud (reads only base deps)
     "azure-cognitiveservices-speech",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest",
-    "ruff",
-    "mypy",
-    "mlflow",
-]
+# CLI tools (openai for LLM, pyyaml for config, rich for console)
+cli = ["openai", "pyyaml", "rich"]
+# TTS providers
+tts-azure = ["azure-cognitiveservices-speech"]
+tts-aws = ["boto3"]
+tts-edge = ["edge-tts"]
+# Local MCP with free edge-tts
+local-mcp = ["ankify[tts-edge]"]
+# Full local: CLI + all TTS providers
+local-all = ["ankify[cli,tts-aws,tts-edge,tts-azure]"]
+# Development tools
+dev = ["pytest", "ruff", "mypy", "mlflow"]
 
 [project.scripts]
 ankify = "ankify.cli:app"
@@ -52,10 +55,18 @@ packages = ["src/ankify"]
 include = [
   "src/ankify/anki/templates/*.html",
   "src/ankify/anki/templates/*.css",
+  "src/ankify/resources/*.json",
+  "src/ankify/resources/prompts/*.j2",
+  "src/ankify/resources/prompts/language_specific/*.md",
+  "src/ankify/resources/tts/*.json",
 ]
 
 [tool.hatch.build.targets.sdist]
 include = [
   "src/ankify/anki/templates/*.html",
   "src/ankify/anki/templates/*.css",
+  "src/ankify/resources/*.json",
+  "src/ankify/resources/prompts/*.j2",
+  "src/ankify/resources/prompts/language_specific/*.md",
+  "src/ankify/resources/tts/*.json",
 ]

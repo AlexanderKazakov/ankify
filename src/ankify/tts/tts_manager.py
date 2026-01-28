@@ -10,9 +10,6 @@ from ..settings import (
 )
 from ..logging import get_logger
 from .tts_base import TTSSingleLanguageClient
-from .aws_tts import AWSPollySingleLanguageClient
-from .azure_tts import AzureTTSSingleLanguageClient
-from .edge_tts import EdgeTTSSingleLanguageClient
 from .tts_cost_tracker import MultiProviderCostTracker
 
 
@@ -23,8 +20,18 @@ def create_tts_single_language_client(
     """
     Create a TTS client for the given config.
     Returns a tuple of (client, provider_name).
+    
+    TTS provider modules are imported lazily to allow installations
+    with only a subset of TTS dependencies.
     """
     if config.provider == "aws":
+        try:
+            from .aws_tts import AWSPollySingleLanguageClient
+        except ImportError as e:
+            raise ImportError(
+                "AWS TTS provider requires 'boto3'. "
+                "Install with: pip install ankify[tts-aws]"
+            ) from e
         return (
             AWSPollySingleLanguageClient(
                 access_settings=providers.aws,
@@ -33,6 +40,13 @@ def create_tts_single_language_client(
             "aws",
         )
     if config.provider == "azure":
+        try:
+            from .azure_tts import AzureTTSSingleLanguageClient
+        except ImportError as e:
+            raise ImportError(
+                "Azure TTS provider requires 'azure-cognitiveservices-speech'. "
+                "Install with: pip install ankify[tts-azure]"
+            ) from e
         return (
             AzureTTSSingleLanguageClient(
                 access_settings=providers.azure,
@@ -41,6 +55,13 @@ def create_tts_single_language_client(
             "azure",
         )
     if config.provider == "edge":
+        try:
+            from .edge_tts import EdgeTTSSingleLanguageClient
+        except ImportError as e:
+            raise ImportError(
+                "Edge TTS provider requires 'edge-tts'. "
+                "Install with: pip install ankify[tts-edge]"
+            ) from e
         return (
             EdgeTTSSingleLanguageClient(
                 language_settings=config.options,

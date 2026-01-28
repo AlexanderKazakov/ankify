@@ -1,8 +1,6 @@
 from pathlib import Path
 from typing import Literal, Any
 
-import yaml
-
 from pydantic import BaseModel, Field, SecretStr, ConfigDict
 from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -270,6 +268,9 @@ class AnkifyYamlSettingsSource(PydanticBaseSettingsSource):
         config_path = Path(str(config_path_value)).expanduser().resolve()
         if not config_path.is_file():
             raise ValueError(f"Config file not found: {config_path}")
+        
+        # Lazy import: yaml is only needed for CLI config loading
+        import yaml
         
         text = config_path.read_text(encoding="utf-8")
         data = yaml.safe_load(text)
