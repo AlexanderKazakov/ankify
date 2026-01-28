@@ -1,14 +1,15 @@
 import json
+import logging
 import os
 import re
+import fastmcp
+
 from importlib import resources
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
-
+from typing import Annotated
 from dotenv import load_dotenv
-
-from mcp.server.fastmcp import FastMCP
 
 from ankify.anki.anki_deck_creator import AnkiDeckCreator
 from ankify.llm.jinja2_prompt_formatter import PromptRenderer
@@ -16,12 +17,16 @@ from ankify.settings import AWSProviderAccess, AzureProviderAccess, NoteType, Pr
 from ankify.tsv import read_from_string
 from ankify.tts.tts_manager import TTSManager
 from ankify.vocab_entry import VocabEntry
-from ankify.logging import get_logger
 
+# logger = logging.getLogger(__name__)
 
-logger = get_logger(__name__)
+logger = fastmcp.utilities.logging.get_logger(__name__)
 
-mcp = FastMCP("Ankify")
+mcp = fastmcp.FastMCP(
+    name="Ankify",
+    instructions="Create Anki decks with TTS speech from arbitrary input",
+    website_url="https://github.com/AlexanderKazakov/ankify",
+)
 
 load_dotenv()
 
@@ -184,9 +189,9 @@ def vocab_ge_en_fb() -> str:
 
 @mcp.tool()
 def convert_TSV_to_Anki_deck(
-    tsv_vocabulary: str,
-    note_type: NoteType,
-    deck_name: str = "Ankify",
+    tsv_vocabulary: Annotated[str, "String with vocabulary table in TSV format"],
+    note_type: Annotated[NoteType, "Type of Anki notes to create, exactly one of: forward_and_backward or forward_only"],
+    deck_name: Annotated[str, "Name of the Anki deck (it's not the file name, it's the deck name within Anki)"],
 ) -> str:
     """
     Creates Anki deck (.apkg) from TSV vocabulary (string).
@@ -286,8 +291,8 @@ Hello World!\tHallo Welt!\tEng\tGe
     logger.info("Ankify Test Deck: %s", uri)
 
 
-# if __name__ == "__main__":
-#     # _test_vocab()
-#     # _test_convert_TSV_to_Anki_deck()
-#     mcp.run(transport="stdio")
+if __name__ == "__main__":
+    # _test_vocab()
+    # _test_convert_TSV_to_Anki_deck()
+    mcp.run(transport="stdio")
 

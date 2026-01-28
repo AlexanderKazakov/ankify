@@ -11,6 +11,15 @@
             "python": "${workspaceFolder}/.venv/bin/python"
         },
         {
+            "name": "mcp_demo_client",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "ankify.mcp.demo_client",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
             "name": "dev_test",
             "type": "debugpy",
             "request": "launch",

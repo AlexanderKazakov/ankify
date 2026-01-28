@@ -17,7 +17,7 @@ dependencies = [
     "tenacity",
     "python-dotenv",
     "jinja2",
-    "mcp",
+    "fastmcp<3",
     # Default TTS for FastMCP Cloud (reads only base deps)
     "azure-cognitiveservices-speech",
 ]

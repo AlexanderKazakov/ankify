@@ -1,6 +1,6 @@
 # Ankify
 
-Create Anki decks with text-to-speech audio from arbitrary text using LLM and TTS services.
+Create Anki decks with text-to-speech audio from arbitrary input using LLM and TTS services.
 
 ## Features
 
