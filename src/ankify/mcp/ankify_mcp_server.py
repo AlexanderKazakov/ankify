@@ -18,9 +18,15 @@ from ankify.tsv import read_from_string
 from ankify.tts.tts_manager import TTSManager
 from ankify.vocab_entry import VocabEntry
 
-# logger = logging.getLogger(__name__)
 
 logger = fastmcp.utilities.logging.get_logger(__name__)
+
+# Configure the 'ankify' logger to use FastMCP's logging infrastructure
+# so that logs from imported modules (tts_manager, anki_deck_creator, etc.) are visible
+fastmcp.utilities.logging.configure_logging(
+    level="INFO",
+    logger=logging.getLogger("ankify"),
+)
 
 mcp = fastmcp.FastMCP(
     name="Ankify",
@@ -324,13 +330,13 @@ async def _test_convert_TSV_to_Anki_deck() -> None:
     logger.info("Ankify Test Deck: %s", result.content[0].text)
 
 
+async def _test_all() -> None:
+    await _test_vocab()
+    await _test_convert_TSV_to_Anki_deck()
+
+
 if __name__ == "__main__":
     # import asyncio
-
-    # async def _test_all() -> None:
-    #     await _test_vocab()
-    #     await _test_convert_TSV_to_Anki_deck()
-
     # asyncio.run(_test_all())
 
     mcp.run(transport="stdio")
