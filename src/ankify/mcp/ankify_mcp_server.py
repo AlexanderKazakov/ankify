@@ -8,7 +8,9 @@ from importlib import resources
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
+from typing import Any
 from pydantic import Field
+from pydantic.fields import FieldInfo
 from dotenv import load_dotenv
 
 from ankify.anki.anki_deck_creator import AnkiDeckCreator
@@ -70,7 +72,14 @@ else:
     logger.info("Using Edge TTS provider (as no AWS credentials found in env)")
 
 
+def _fix_field_default_fastmcp_bug(value: Any) -> Any:
+    if isinstance(value, FieldInfo):
+        return value.default
+    return value
+
+
 def _deck_prompt(note_type: NoteType | str, deck_name: str) -> str:
+    deck_name = _fix_field_default_fastmcp_bug(deck_name)
     return f"""
 Create Anki deck from the vocabulary table with the note type: `{note_type}` and deck name: `{deck_name}`.
 Use the MCP tool `convert_TSV_to_Anki_deck` for this.
@@ -149,6 +158,11 @@ def _vocab_prompt(
         note_type: str,
         custom_instructions: str = "",
 ) -> str:
+    language_a = _fix_field_default_fastmcp_bug(language_a)
+    language_b = _fix_field_default_fastmcp_bug(language_b)
+    note_type = _fix_field_default_fastmcp_bug(note_type)
+    custom_instructions = _fix_field_default_fastmcp_bug(custom_instructions)
+
     if note_type == "fo":
         note_type = "forward_only"
     elif note_type == "fb":
