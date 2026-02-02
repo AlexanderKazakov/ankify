@@ -84,6 +84,7 @@ def _deck_prompt(note_type: NoteType | str, deck_name: str) -> str:
 Create Anki deck from the vocabulary table with the note type: `{note_type}` and deck name: `{deck_name}`.
 Use the MCP tool `convert_TSV_to_Anki_deck` for this.
 If there are multiple vocabulary table versions in the chat, use the latest/actual/user-approved one.
+Always put a full valid explicit clickable URI of the generated .apkg file in your answer, not just the file name or path, even if the file is local. That URI is returned to you by the MCP tool.
 """
 
 

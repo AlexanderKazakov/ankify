@@ -14,12 +14,18 @@ If the deck name in settings is equal to the name of an existing deck in your An
 
 ## Installation
 
+```bash
+git clone https://github.com/AlexanderKazakov/ankify.git
+cd ankify
+uv venv --python 3.12
+```
+
 ### Local MCP Server
 
 For local MCP server with free Edge TTS:
 
 ```bash
-pip install ankify[local-mcp]
+uv pip install -e .[local-mcp]
 ```
 
 ### Full Local (CLI + All TTS)
@@ -27,7 +33,7 @@ pip install ankify[local-mcp]
 For all the features including CLI and all TTS providers:
 
 ```bash
-pip install ankify[local-all]
+uv pip install -e .[local-all]
 ```
 
 ### FastMCP Cloud
@@ -35,15 +41,12 @@ pip install ankify[local-all]
 You need this only when deploying to FastMCP Cloud. This is the default installation option just because that's how it works with FastMCP Cloud. So most probably you don't need it.
 
 ```bash
-pip install ankify
+uv pip install -e .
 ```
 
 ### Development
 
 ```bash
-git clone https://github.com/AlexanderKazakov/ankify.git
-cd ankify
-uv venv --python 3.12
 uv pip install -e .[local-all,dev]
 ```
 
@@ -57,7 +60,7 @@ Deploy to FastMCP Cloud for hosted MCP access. The server uses Azure TTS by defa
 
 ### Local MCP Server
 
-Add to your MCP client configuration:
+Add to your MCP client (Claude Desktop, Cursor, etc.) configuration:
 
 ```json
 {
@@ -103,9 +106,9 @@ From my (limited to English, German, and Russian) experience, all "Neural" engin
 Install specific providers:
 
 ```bash
-pip install ankify[tts-azure]
-pip install ankify[tts-aws]
-pip install ankify[tts-edge]
+uv pip install -e .[tts-azure]
+uv pip install -e .[tts-aws]
+uv pip install -e .[tts-edge]
 ```
 
 ## CLI
@@ -114,7 +117,7 @@ For CLI usage documentation, see [docs/CLI.md](docs/CLI.md).
 
 ## Environment Variables
 
-Provider credentials can be set via environment variables or `.env` file, see `.env.example` for examples.
+Provider credentials can be set via environment variables or `.env` file, see `.env.example`.
 
 ## License
 
