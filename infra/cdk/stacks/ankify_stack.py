@@ -67,13 +67,14 @@ class AnkifyStack(Stack):
                 file="infra/docker/Dockerfile",
             ),
             architecture=lambda_.Architecture.ARM_64,
-            memory_size=1024,
-            timeout=Duration.minutes(15),
+            memory_size=333,
+            timeout=Duration.minutes(1),
+            reserved_concurrent_executions=100,
             environment={
                 "PORT": aws_lwa_port,
                 "AWS_LWA_PORT": aws_lwa_port,
                 "AWS_LWA_READINESS_CHECK_PATH": "/health",
-                "AWS_LWA_INVOKE_MODE": "RESPONSE_STREAM",
+                "AWS_LWA_INVOKE_MODE": "BUFFERED",
                 "ANKIFY_S3_BUCKET": bucket.bucket_name,
                 "ANKIFY_PRESIGNED_URL_EXPIRY": "86400",
                 "ANKIFY_AZURE_SECRET_ARN": azure_secret.secret_arn,
@@ -91,7 +92,7 @@ class AnkifyStack(Stack):
         # Function URL with no authentication (Level 1 MVP)
         function_url = lambda_fn.add_function_url(
             auth_type=lambda_.FunctionUrlAuthType.NONE,
-            invoke_mode=lambda_.InvokeMode.RESPONSE_STREAM,
+            invoke_mode=lambda_.InvokeMode.BUFFERED,
         )
 
         # Outputs

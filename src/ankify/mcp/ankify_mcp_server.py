@@ -51,7 +51,7 @@ def _configure_logging_patched(
     # Use standard logging handlers if rich logging is disabled
     if not enable_rich_logging:
         handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+        handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s"))
         logger.addHandler(handler)
         return
 
@@ -151,7 +151,7 @@ def _get_azure_subscription_key() -> str | None:
         client = boto3.client("secretsmanager")
         response = client.get_secret_value(SecretId=secret_arn)
         return response["SecretString"]
-    # Fall back to direct environment variable (local development)
+    # Fall back to direct environment variable (local execution)
     return os.getenv("ANKIFY__PROVIDERS__AZURE__SUBSCRIPTION_KEY")
 
 
@@ -195,6 +195,7 @@ def _fix_field_default_fastmcp_bug(value: Any) -> Any:
 
 def _deck_prompt(note_type: NoteType | str, deck_name: str) -> str:
     deck_name = _fix_field_default_fastmcp_bug(deck_name)
+    logger.info("Received PROMPT request: deck: note_type '%s', deck_name '%s'", note_type, deck_name)
     return f"""
 Create Anki deck from the vocabulary table with the note type: `{note_type}` and deck name: `{deck_name}`.
 Use the MCP tool `convert_TSV_to_Anki_deck` for this.
@@ -274,6 +275,7 @@ def _vocab_prompt(
         note_type: str,
         custom_instructions: str = "",
 ) -> str:
+    logger.info("Received PROMPT request: vocab: language_a '%s', language_b '%s', note_type '%s'", language_a, language_b, note_type)
     language_a = _fix_field_default_fastmcp_bug(language_a)
     language_b = _fix_field_default_fastmcp_bug(language_b)
     note_type = _fix_field_default_fastmcp_bug(note_type)
@@ -390,7 +392,7 @@ def convert_TSV_to_Anki_deck(
     Returns:
         URI of the generated .apkg file
     """
-    logger.info("Received request to create deck '%s' with note_type '%s'", deck_name, note_type)
+    logger.info("Received TOOL request: convert_TSV_to_Anki_deck: note_type '%s', deck_name '%s'", note_type, deck_name)
     
     try:
         vocab_entries: list[VocabEntry] = read_from_string(tsv_vocabulary)
@@ -481,7 +483,9 @@ if __name__ == "__main__":
 
 
 # ASGI app for uvicorn (used in Docker with Lambda Web Adapter)
+# About parameters see docs/mcp-http-transport-options.md
 app = mcp.http_app(
     stateless_http=True,
+    json_response=True,
 )
 
