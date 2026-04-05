@@ -206,26 +206,11 @@ def _fix_field_default_fastmcp_bug(value: Any) -> Any:
     return value
 
 
-def _deck_prompt(note_type: NoteType | str, deck_name: str) -> str:
-    deck_name = _fix_field_default_fastmcp_bug(deck_name)
-    logger.info(
-        "Received PROMPT request: deck: note_type '%s', deck_name '%s'",
-        note_type,
-        deck_name,
-    )
-    return f"""
-Create Anki deck from the vocabulary table with the note type: `{note_type}` and deck name: `{deck_name}`.
-Use the MCP tool `convert_TSV_to_Anki_deck` for this.
-If there are multiple vocabulary table versions in the chat, use the latest/actual/user-approved one.
-Always put a full valid explicit clickable URI of the generated .apkg file in your answer, not just the file name or path, even if the file is local. That URI is returned to you by the MCP tool.
-"""
-
-
 @mcp.prompt(
     title="Create Anki Deck",
     description="Prompt to create Anki deck file from the vocabulary table. "
-    "The note type is deduced by the LLM automatically. Use 'deck_fo' and 'deck_fb' prompts for explicit note type choices."
-    "The table has to be already present in the chat at the time of the prompt.",
+    "The note type is deduced by the LLM automatically."
+    "The table has to be already present in the chat at the time of the prompting.",
 )
 def deck(
     deck_name: str = Field(
@@ -233,42 +218,23 @@ def deck(
         description="Deck name (it's not the file name, it's the deck name within Anki)",
     ),
 ) -> str:
-    basic_prompt = _deck_prompt(
-        note_type="<choose it yourself intelligently>", deck_name=deck_name
+    deck_name = _fix_field_default_fastmcp_bug(deck_name)
+    logger.info(
+        "Received PROMPT request: deck: deck_name '%s'",
+        deck_name,
     )
-    note_type_instructions = """
+    return f"""
+Create Anki deck from the vocabulary table with the deck name: `{deck_name}`.
+Use the MCP tool `convert_TSV_to_Anki_deck` for this.
+
+If there are multiple vocabulary table versions in the chat, use the latest/actual/user-approved one.
+
 Deduce the note type from the vocabulary table, the tool description, and the previous instructions.
-If you are not sure, ask the user for the exact note type, and mention that there are explicit prompt shortcuts: 'deck_fo' and 'deck_fb'.
+If you are not sure, ask the user for the exact note type.
+
+Always put a full valid explicit clickable URI of the generated .apkg file in your answer, 
+not just the file name or path, even if the file is local. That URI is returned to you by the MCP tool.
 """
-    return f"{basic_prompt}\n{note_type_instructions}"
-
-
-@mcp.prompt(
-    title="Create Anki Deck with Forward-Only notes",
-    description="Prompt to create Anki deck file with 'forward_only' notes from the vocabulary table. "
-    "The table has to be already present in the chat at the time of the prompt.",
-)
-def deck_fo(
-    deck_name: str = Field(
-        default="Ankify",
-        description="Deck name (it's not the file name, it's the deck name within Anki)",
-    ),
-) -> str:
-    return _deck_prompt(note_type="forward_only", deck_name=deck_name)
-
-
-@mcp.prompt(
-    title="Create Anki Deck with Forward-and-Backward notes",
-    description="Prompt to create Anki deck file with 'forward_and_backward' notes from the vocabulary table. "
-    "The table has to be already present in the chat at the time of the prompt.",
-)
-def deck_fb(
-    deck_name: str = Field(
-        default="Ankify",
-        description="Deck name (it's not the file name, it's the deck name within Anki)",
-    ),
-) -> str:
-    return _deck_prompt(note_type="forward_and_backward", deck_name=deck_name)
 
 
 def _resolve_language_alias(language: str) -> str:
@@ -294,11 +260,35 @@ def _resolve_instructions_for_language(language: str) -> str:
     return ""
 
 
-def _vocab_prompt(
-    language_a: str,
-    language_b: str,
-    note_type: str,
-    custom_instructions: str = "",
+@mcp.prompt(
+    title="Create Vocabulary Table (universal parametrizable template)",
+    description="""
+Prompt to create vocabulary table in TSV format from the user input. 
+The universal template, to be parametrized with languages, note type, and additional custom instructions. 
+'language_a' is the language being studied, 'language_b' is the known language, any language is supported.
+
+Languages can be specified quite flexibly like "English", "en", "ENG", "GE", "ger", "Rus", "russian", "Turkish", etc.
+
+Note type can be specified quite flexibly like "fo" (forward only), "fb" (forward and backward), "forward only", "Forward and backward", "forward-only", "forward-and-backward", "forward_only", "forward_and_backward".
+""",
+)
+def vocab(
+    language_a: str = Field(
+        default="language_a",
+        description="The language being studied (front side). Accepts flexible formats: 'English', 'en', 'ENG', 'GE', 'ger', 'Rus', 'russian', 'Turkish', etc.",
+    ),
+    language_b: str = Field(
+        default="language_b",
+        description="The known language (back side). Accepts flexible formats: 'English', 'en', 'ENG', 'GE', 'ger', 'Rus', 'russian', 'Turkish', etc.",
+    ),
+    note_type: str = Field(
+        default="fb",
+        description="Type of Anki notes: 'forward_only' (fo) for one card per note, 'forward_and_backward' (fb) for two cards per note. Accepts flexible formats: 'fo', 'fb', 'forward_only', 'forward_and_backward', 'Forward only', 'Forward and backward', 'forward-only', 'forward-and-backward', 'forward_only', 'forward_and_backward'.",
+    ),
+    custom_instructions: str = Field(
+        default="",
+        description="Optional additional instructions to customize vocabulary generation (e.g., focus on specific topics, style preferences).",
+    ),
 ) -> str:
     logger.info(
         "Received PROMPT request: vocab: language_a '%s', language_b '%s', note_type '%s'",
@@ -341,64 +331,6 @@ def _vocab_prompt(
             "language_b_instructions": language_b_instructions,
             "custom_instructions": custom_instructions,
         },
-    )
-
-
-@mcp.prompt(
-    title="Create Vocabulary Table (universal parametrizable template)",
-    description="""
-Prompt to create vocabulary table in TSV format from the user input. 
-The universal template, to be parametrized with languages, note type, and additional custom instructions. 
-'language_a' is the language being studied, 'language_b' is the known language, any language is supported.
-
-Languages can be specified quite flexibly like "English", "en", "ENG", "GE", "ger", "Rus", "russian", "Turkish", etc.
-
-Note type can be specified quite flexibly like "fo" (forward only), "fb" (forward and backward), "forward only", "Forward and backward", "forward-only", "forward-and-backward", "forward_only", "forward_and_backward".
-""",
-)
-def vocab(
-    language_a: str = Field(
-        default="language_a",
-        description="The language being studied (front side). Accepts flexible formats: 'English', 'en', 'ENG', 'GE', 'ger', 'Rus', 'russian', 'Turkish', etc.",
-    ),
-    language_b: str = Field(
-        default="language_b",
-        description="The known language (back side). Accepts flexible formats: 'English', 'en', 'ENG', 'GE', 'ger', 'Rus', 'russian', 'Turkish', etc.",
-    ),
-    note_type: str = Field(
-        default="fb",
-        description="Type of Anki notes: 'forward_only' (fo) for one card per note, 'forward_and_backward' (fb) for two cards per note. Accepts flexible formats: 'fo', 'fb', 'forward_only', 'forward_and_backward', 'Forward only', 'Forward and backward', 'forward-only', 'forward-and-backward', 'forward_only', 'forward_and_backward'.",
-    ),
-    custom_instructions: str = Field(
-        default="",
-        description="Optional additional instructions to customize vocabulary generation (e.g., focus on specific topics, style preferences).",
-    ),
-) -> str:
-    return _vocab_prompt(
-        language_a=language_a,
-        language_b=language_b,
-        note_type=note_type,
-        custom_instructions=custom_instructions,
-    )
-
-
-@mcp.prompt(
-    title="Create Vocabulary Table (English-Russian, forward-only notes)",
-    description="Shortcut for 'vocab' with language_a='English', language_b='Russian', note_type='forward_only'",
-)
-def vocab_en_ru_fo() -> str:
-    return _vocab_prompt(
-        language_a="English", language_b="Russian", note_type="forward_only"
-    )
-
-
-@mcp.prompt(
-    title="Create Vocabulary Table (German-English, forward-and-backward notes)",
-    description="Shortcut for 'vocab' with language_a='German', language_b='English', note_type='forward_and_backward'",
-)
-def vocab_ge_en_fb() -> str:
-    return _vocab_prompt(
-        language_a="German", language_b="English", note_type="forward_and_backward"
     )
 
 
@@ -503,13 +435,23 @@ def package_anki_deck(
 
 async def _test_vocab() -> None:
     with open("tmp/vocab_en_ru_fo.md", "w", encoding="utf-8") as f:
-        f.write((await vocab_en_ru_fo.render())[0].content.text)
+        f.write(
+            (
+                await vocab.render(
+                    {
+                        "language_a": "English",
+                        "language_b": "Russian",
+                        "note_type": "forward_only",
+                    }
+                )
+            )[0].content.text
+        )
     with open("tmp/vocab_en_ru_fb.md", "w", encoding="utf-8") as f:
         f.write(
             (
                 await vocab.render(
                     {
-                        "language_a": "en",
+                        "language_a": "eng",
                         "language_b": "ru",
                         "note_type": "forward and backward",
                         "custom_instructions": "Some custom instructions...",
@@ -518,7 +460,17 @@ async def _test_vocab() -> None:
             )[0].content.text
         )
     with open("tmp/vocab_ge_en_fb.md", "w", encoding="utf-8") as f:
-        f.write((await vocab_ge_en_fb.render())[0].content.text)
+        f.write(
+            (
+                await vocab.render(
+                    {
+                        "language_a": "ger",
+                        "language_b": "en",
+                        "note_type": "forward_and_backward",
+                    }
+                )
+            )[0].content.text
+        )
     with open("tmp/vocab_ge_en_fo.md", "w", encoding="utf-8") as f:
         f.write(
             (

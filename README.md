@@ -108,9 +108,7 @@ Deploy to AWS Lambda for hosted MCP access. See [infra/README.md](infra/README.m
 **Prompts:**
 
 - `vocab` - Create vocabulary table (universal template for any language pair, note type, custom instructions)
-- `vocab_en_ru_fo` - shortcut for English-Russian, forward-only not
-- `vocab_ge_en_fb` - shortcut for German-English, forward-and-backward
-- `deck` / `deck_fo` / `deck_fb` - Create Anki deck from vocabulary table (instructs AI to use the conversion tool properly)
+- `deck` - Create Anki deck from vocabulary table (instructs AI to use the conversion tool properly)
 
 **Tools:**
 
