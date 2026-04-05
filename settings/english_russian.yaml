@@ -14,9 +14,9 @@ confirm_steps: true
 log_level: INFO
 
 # The language being studied
-language_a: English
+language_studied: English
 # The known language
-language_b: Russian
+language_known: Russian
 
 # The type of notes to create. Should be consistent with the LLM prompt.
 # One of: "forward_and_backward" or "forward_only"

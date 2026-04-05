@@ -33,8 +33,8 @@ async def get_prompt__vocab(client):
     result = await client.get_prompt_mcp(
         "vocab",
         {
-            "language_a": "English",
-            "language_b": "German",
+            "language_studied": "English",
+            "language_known": "German",
             "note_type": "forward_and_backward",
             "custom_instructions": "Some custom instructions...",
         },

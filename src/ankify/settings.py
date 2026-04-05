@@ -218,8 +218,8 @@ class Settings(BaseSettings):
         description="If true, interactively confirm key steps before proceeding.",
     )
 
-    language_a: str = Field(description="Target language being studied (e.g., German).")
-    language_b: str = Field(description="Known/native language (e.g., English).")
+    language_studied: str = Field(description="Target language being studied (e.g., German).")
+    language_known: str = Field(description="Known/native language (e.g., English).")
 
     note_type: NoteType = Field(
         default="forward_and_backward",

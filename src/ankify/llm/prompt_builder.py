@@ -18,8 +18,8 @@ class PromptBuilder:
 
         context: dict[str, Any] = {
             "note_type": self._settings.note_type,
-            "language_a": self._settings.language_a,
-            "language_b": self._settings.language_b,
+            "language_studied": self._settings.language_studied,
+            "language_known": self._settings.language_known,
             "custom_instructions": custom_instructions,
             "few_shot_examples": few_shot_examples,
         }

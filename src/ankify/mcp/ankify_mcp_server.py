@@ -265,7 +265,6 @@ def _resolve_instructions_for_language(language: str) -> str:
     description="""
 Prompt to create vocabulary table in TSV format from the user input. 
 The universal template, to be parametrized with languages, note type, and additional custom instructions. 
-'language_a' is the language being studied, 'language_b' is the known language, any language is supported.
 
 Languages can be specified quite flexibly like "English", "en", "ENG", "GE", "ger", "Rus", "russian", "Turkish", etc.
 
@@ -273,12 +272,12 @@ Note type can be specified quite flexibly like "fo" (forward only), "fb" (forwar
 """,
 )
 def vocab(
-    language_a: str = Field(
-        default="language_a",
+    language_studied: str = Field(
+        default="language_studied",
         description="The language being studied (front side). Accepts flexible formats: 'English', 'en', 'ENG', 'GE', 'ger', 'Rus', 'russian', 'Turkish', etc.",
     ),
-    language_b: str = Field(
-        default="language_b",
+    language_known: str = Field(
+        default="language_known",
         description="The known language (back side). Accepts flexible formats: 'English', 'en', 'ENG', 'GE', 'ger', 'Rus', 'russian', 'Turkish', etc.",
     ),
     note_type: str = Field(
@@ -291,13 +290,13 @@ def vocab(
     ),
 ) -> str:
     logger.info(
-        "Received PROMPT request: vocab: language_a '%s', language_b '%s', note_type '%s'",
-        language_a,
-        language_b,
+        "Received PROMPT request: vocab: language_studied '%s', language_known '%s', note_type '%s'",
+        language_studied,
+        language_known,
         note_type,
     )
-    language_a = _fix_field_default_fastmcp_bug(language_a)
-    language_b = _fix_field_default_fastmcp_bug(language_b)
+    language_studied = _fix_field_default_fastmcp_bug(language_studied)
+    language_known = _fix_field_default_fastmcp_bug(language_known)
     note_type = _fix_field_default_fastmcp_bug(note_type)
     custom_instructions = _fix_field_default_fastmcp_bug(custom_instructions)
 
@@ -316,19 +315,19 @@ def vocab(
         .joinpath("mcp_prompt_template.md.j2")
         .read_text(encoding="utf-8")
     )
-    language_a = _resolve_language_alias(language_a)
-    language_b = _resolve_language_alias(language_b)
-    language_a_instructions = _resolve_instructions_for_language(language_a)
-    language_b_instructions = _resolve_instructions_for_language(language_b)
+    language_studied = _resolve_language_alias(language_studied)
+    language_known = _resolve_language_alias(language_known)
+    language_studied_instructions = _resolve_instructions_for_language(language_studied)
+    language_known_instructions = _resolve_instructions_for_language(language_known)
 
     return PromptRenderer.render(
         template_content=template_content,
         context={
-            "language_a": language_a,
-            "language_b": language_b,
+            "language_studied": language_studied,
+            "language_known": language_known,
             "note_type": note_type,
-            "language_a_instructions": language_a_instructions,
-            "language_b_instructions": language_b_instructions,
+            "language_studied_instructions": language_studied_instructions,
+            "language_known_instructions": language_known_instructions,
             "custom_instructions": custom_instructions,
         },
     )
@@ -439,8 +438,8 @@ async def _test_vocab() -> None:
             (
                 await vocab.render(
                     {
-                        "language_a": "English",
-                        "language_b": "Russian",
+                        "language_studied": "English",
+                        "language_known": "Russian",
                         "note_type": "forward_only",
                     }
                 )
@@ -451,8 +450,8 @@ async def _test_vocab() -> None:
             (
                 await vocab.render(
                     {
-                        "language_a": "eng",
-                        "language_b": "ru",
+                        "language_studied": "eng",
+                        "language_known": "ru",
                         "note_type": "forward and backward",
                         "custom_instructions": "Some custom instructions...",
                     }
@@ -464,8 +463,8 @@ async def _test_vocab() -> None:
             (
                 await vocab.render(
                     {
-                        "language_a": "ger",
-                        "language_b": "en",
+                        "language_studied": "ger",
+                        "language_known": "en",
                         "note_type": "forward_and_backward",
                     }
                 )
@@ -475,7 +474,7 @@ async def _test_vocab() -> None:
         f.write(
             (
                 await vocab.render(
-                    {"language_a": "de", "language_b": "eng", "note_type": "fo"}
+                    {"language_studied": "de", "language_known": "eng", "note_type": "fo"}
                 )
             )[0].content.text
         )
@@ -483,7 +482,7 @@ async def _test_vocab() -> None:
         f.write(
             (
                 await vocab.render(
-                    {"language_a": "ar", "language_b": "tr", "note_type": "fb"}
+                    {"language_studied": "ar", "language_known": "tr", "note_type": "fb"}
                 )
             )[0].content.text
         )

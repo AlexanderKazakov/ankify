@@ -53,8 +53,8 @@ All options can be set via:
 
 ### Required Settings
 
-- `language_a` - Target language being studied (e.g., German)
-- `language_b` - Known/native language (e.g., English)
+- `language_studied` - Target language being studied (e.g., German)
+- `language_known` - Known/native language (e.g., English)
 
 ### Provider Credentials
 

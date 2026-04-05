@@ -36,11 +36,11 @@ Every row in the output has exactly 4 cells: a word or phrase in the 1st column,
 
 {% if note_type == "forward_and_backward" %}
 
-The dictionary is one-way. All the cells in the 1st column are in {{ language_a }}, and all the cells in the 2nd column are in {{ language_b }}. The 3rd column is always `{{ language_a }}`, and the 4th column is always `{{ language_b }}`.
+The dictionary is one-way. All the cells in the 1st column are in {{ language_studied }}, and all the cells in the 2nd column are in {{ language_known }}. The 3rd column is always `{{ language_studied }}`, and the 4th column is always `{{ language_known }}`.
 The output format is:
 ```
-{{ language_a }} word	its {{ language_b }} translation	{{ language_a }}	{{ language_b }}
-another {{ language_a }} word	another {{ language_b }} translation	{{ language_a }}	{{ language_b }}
+{{ language_studied }} word	its {{ language_known }} translation	{{ language_studied }}	{{ language_known }}
+another {{ language_studied }} word	another {{ language_known }} translation	{{ language_studied }}	{{ language_known }}
 ...
 ```
 
@@ -59,17 +59,17 @@ to contend with something	сталкиваться, иметь дело, бор�
 
 {% elif note_type == "forward_only" %}
 
-The dictionary is two-way. The pairs "{{ language_a }} -> {{ language_b }}" are interleaved with "{{ language_b }} -> {{ language_a }}" pairs.
+The dictionary is two-way. The pairs "{{ language_studied }} -> {{ language_known }}" are interleaved with "{{ language_known }} -> {{ language_studied }}" pairs.
 The output format is:
 ```
-{{ language_a }} word	its {{ language_b }} translation	{{ language_a }}	{{ language_b }}
-its {{ language_b }} translation	{{ language_a }} word	{{ language_b }}	{{ language_a }}
-another {{ language_a }} word	another {{ language_b }} translation	{{ language_a }}	{{ language_b }}
-another {{ language_b }} translation	another {{ language_a }} word	{{ language_b }}	{{ language_a }}
+{{ language_studied }} word	its {{ language_known }} translation	{{ language_studied }}	{{ language_known }}
+its {{ language_known }} translation	{{ language_studied }} word	{{ language_known }}	{{ language_studied }}
+another {{ language_studied }} word	another {{ language_known }} translation	{{ language_studied }}	{{ language_known }}
+another {{ language_known }} translation	another {{ language_studied }} word	{{ language_known }}	{{ language_studied }}
 ...
 ```
 
-In general, "{{ language_b }} -> {{ language_a }}" pairs should just repeat the "{{ language_a }} -> {{ language_b }}" pairs in the reverse order, but sometimes you should adjust, extend, or even split a row into several rows to make the Anki card clearer. Imagine yourself learning this table in the following way: given a word from the 1st column, you need to recall its translation from the 2nd column. And sometimes translation in one direction is good, but in the opposite direction, it is awkward. Then, you need to adjust or extend the first column, or even split the row into a couple of separate ones. The ultimate goal is to create a meaningful table for learning the 2nd column given the 1st column, not just duplicate every row swapping the cells. Keep that in mind when you decide on the translation and phrasing!
+In general, "{{ language_known }} -> {{ language_studied }}" pairs should just repeat the "{{ language_studied }} -> {{ language_known }}" pairs in the reverse order, but sometimes you should adjust, extend, or even split a row into several rows to make the Anki card clearer. Imagine yourself learning this table in the following way: given a word from the 1st column, you need to recall its translation from the 2nd column. And sometimes translation in one direction is good, but in the opposite direction, it is awkward. Then, you need to adjust or extend the first column, or even split the row into a couple of separate ones. The ultimate goal is to create a meaningful table for learning the 2nd column given the 1st column, not just duplicate every row swapping the cells. Keep that in mind when you decide on the translation and phrasing!
 
 For example, if we were building an English-Russian vocabulary just for the single verb 'to contend with':
 That would be a very bad result:
@@ -88,9 +88,9 @@ to contend with something	сталкиваться, иметь дело, бор�
 {% set _ = fail('Invalid note type: `' ~ note_type ~ '`') %}
 {% endif %}
 
-{{ language_a_instructions }}
+{{ language_studied_instructions }}
 
-{{ language_b_instructions }}
+{{ language_known_instructions }}
 
 {{ custom_instructions }}
 
