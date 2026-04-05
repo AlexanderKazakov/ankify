@@ -23,7 +23,7 @@ Separate synonyms with commas. Separate different translations of the same word 
 
 Every row in the output has exactly 4 cells: a word or phrase in the 1st column, its translation in the 2nd column, and the language labels in the 3rd and 4th columns.
 
-{% if note_type == "forward_and_backward" %}
+{% if note_type == "basic_and_reversed" %}
 The dictionary is one-way. All the cells in the 1st column are in {{ language_studied }}, and all the cells in the 2nd column are in {{ language_known }}. The 3rd column is always `{{ language_studied }}`, and the 4th column is always `{{ language_known }}`.
 The output format is:
 ```
@@ -32,7 +32,7 @@ another {{ language_studied }} word	another {{ language_known }} translation	{{ 
 ...
 ```
 Imagine yourself learning this table in the following way: given a word from the 1st column, you need to recall its translation from the 2nd column, and vice versa: given a word from the 2nd column, you need to recall its translation from the 1st column.
-{% elif note_type == "forward_only" %}
+{% elif note_type == "basic" %}
 The dictionary is two-way. The pairs "{{ language_studied }} -> {{ language_known }}" are interleaved with "{{ language_known }} -> {{ language_studied }}" pairs.
 The output format is:
 ```

@@ -17,8 +17,8 @@ language_studied: German
 language_known: English
 
 # The type of notes to create. Should be consistent with the LLM prompt.
-# One of: "forward_and_backward" or "forward_only"
-note_type: forward_and_backward
+# One of: "basic_and_reversed" or "basic"
+note_type: basic_and_reversed
 
 # LLM settings and prompt.
 # The LLM prompt should be consistent with the note_type and with the languages
@@ -29,7 +29,7 @@ llm:
     # reasoning_effort: high
     prompt_template: ./settings/prompts/prompt_template.md.j2
     custom_instructions: ./settings/prompts/custom_instructions/german_english_b1.md
-    # few_shot_examples: ./settings/prompts/few_shot_examples/forward_and_backward_german_english_b1
+    # few_shot_examples: ./settings/prompts/few_shot_examples/basic_and_reversed_german_english_b1
 # tts:
 # default_provider: edge
 # default_provider: aws

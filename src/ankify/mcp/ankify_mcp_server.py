@@ -268,7 +268,7 @@ The universal template, to be parametrized with languages, note type, and additi
 
 Languages can be specified quite flexibly like "English", "en", "ENG", "GE", "ger", "Rus", "russian", "Turkish", etc.
 
-Note type can be specified quite flexibly like "fo" (forward only), "fb" (forward and backward), "forward only", "Forward and backward", "forward-only", "forward-and-backward", "forward_only", "forward_and_backward".
+Note type can be specified quite flexibly like "ba" (Basic), "br" (Basic & Reversed), "basic", "basic_and_reversed", "basic and reversed", "basic & reversed", "Basic & Reversed", etc.
 """,
 )
 def vocab(
@@ -281,8 +281,8 @@ def vocab(
         description="The known language (back side). Accepts flexible formats: 'English', 'en', 'ENG', 'GE', 'ger', 'Rus', 'russian', 'Turkish', etc.",
     ),
     note_type: str = Field(
-        default="fb",
-        description="Type of Anki notes: 'forward_only' (fo) for one card per note, 'forward_and_backward' (fb) for two cards per note. Accepts flexible formats: 'fo', 'fb', 'forward_only', 'forward_and_backward', 'Forward only', 'Forward and backward', 'forward-only', 'forward-and-backward', 'forward_only', 'forward_and_backward'.",
+        default="br",
+        description="Type of Anki notes: 'basic' (ba) for one card per note, 'basic_and_reversed' (br) for two cards per note. Accepts flexible formats including 'basic', 'basic_and_reversed', 'basic and reversed', 'basic & reversed', 'ba', 'br'.",
     ),
     custom_instructions: str = Field(
         default="",
@@ -300,14 +300,17 @@ def vocab(
     note_type = _fix_field_default_fastmcp_bug(note_type)
     custom_instructions = _fix_field_default_fastmcp_bug(custom_instructions)
 
-    if note_type == "fo":
-        note_type = "forward_only"
-    elif note_type == "fb":
-        note_type = "forward_and_backward"
+    note_type_raw = note_type.lower().strip()
+    if note_type_raw == "ba":
+        note_type = "basic"
+    elif note_type_raw == "br":
+        note_type = "basic_and_reversed"
     else:
-        note_type = note_type.lower().strip().replace(" ", "_").replace("-", "_")
+        s = note_type_raw.replace("&", " and ")
+        s = re.sub(r"[\s\-]+", "_", s)
+        note_type = re.sub(r"_+", "_", s).strip("_")
 
-    if note_type not in ["forward_only", "forward_and_backward"]:
+    if note_type not in ("basic", "basic_and_reversed"):
         raise ValueError("Invalid note type")
 
     template_content = (
@@ -345,7 +348,7 @@ def convert_TSV_to_Anki_deck(
         description="String with vocabulary table in TSV format"
     ),
     note_type: NoteType = Field(
-        description="Type of Anki notes to create, exactly one of: forward_and_backward or forward_only"
+        description="Type of Anki notes to create, exactly one of: basic_and_reversed or basic"
     ),
     deck_name: str = Field(
         description="Name of the Anki deck (it's not the file name, it's the deck name within Anki)"
@@ -364,8 +367,8 @@ def convert_TSV_to_Anki_deck(
             `front_text<tab>back_text<tab>front_language<tab>back_language<newline>...`
 
         note_type: type of Anki notes to create, exactly one of:
-            - `forward_and_backward` - two cards per note: forward and backward
-            - `forward_only` - one card per note: forward only
+            - `basic_and_reversed` - two cards per note: forward and reversed
+            - `basic` - one card per note: forward only
 
         deck_name: name of the Anki deck (it's not the file name, it's the deck name within Anki)
 
@@ -433,56 +436,64 @@ def package_anki_deck(
 
 
 async def _test_vocab() -> None:
-    with open("tmp/vocab_en_ru_fo.md", "w", encoding="utf-8") as f:
+    with open("tmp/vocab_en_ru_ba.md", "w", encoding="utf-8") as f:
         f.write(
             (
                 await vocab.render(
                     {
                         "language_studied": "English",
                         "language_known": "Russian",
-                        "note_type": "forward_only",
+                        "note_type": "basic",
                     }
                 )
             )[0].content.text
         )
-    with open("tmp/vocab_en_ru_fb.md", "w", encoding="utf-8") as f:
+    with open("tmp/vocab_en_ru_br.md", "w", encoding="utf-8") as f:
         f.write(
             (
                 await vocab.render(
                     {
                         "language_studied": "eng",
                         "language_known": "ru",
-                        "note_type": "forward and backward",
+                        "note_type": "basic and reversed",
                         "custom_instructions": "Some custom instructions...",
                     }
                 )
             )[0].content.text
         )
-    with open("tmp/vocab_ge_en_fb.md", "w", encoding="utf-8") as f:
+    with open("tmp/vocab_ge_en_br.md", "w", encoding="utf-8") as f:
         f.write(
             (
                 await vocab.render(
                     {
                         "language_studied": "ger",
                         "language_known": "en",
-                        "note_type": "forward_and_backward",
+                        "note_type": "basic_and_reversed",
                     }
                 )
             )[0].content.text
         )
-    with open("tmp/vocab_ge_en_fo.md", "w", encoding="utf-8") as f:
+    with open("tmp/vocab_ge_en_ba.md", "w", encoding="utf-8") as f:
         f.write(
             (
                 await vocab.render(
-                    {"language_studied": "de", "language_known": "eng", "note_type": "fo"}
+                    {
+                        "language_studied": "de",
+                        "language_known": "eng",
+                        "note_type": "ba",
+                    }
                 )
             )[0].content.text
         )
-    with open("tmp/vocab_ar_tr_fb.md", "w", encoding="utf-8") as f:
+    with open("tmp/vocab_ar_tr_br.md", "w", encoding="utf-8") as f:
         f.write(
             (
                 await vocab.render(
-                    {"language_studied": "ar", "language_known": "tr", "note_type": "fb"}
+                    {
+                        "language_studied": "ar",
+                        "language_known": "tr",
+                        "note_type": "br",
+                    }
                 )
             )[0].content.text
         )
@@ -494,7 +505,7 @@ async def _test_convert_TSV_to_Anki_deck() -> None:
             "tsv_vocabulary": """Hello World!\tHallo Welt!\tEng\tGe
 Как дела?\t¿Cómo estás?\tRus\tSpanish
 كم تبلغ من العمر؟\t你今年多大\tArabic\tChinese""",
-            "note_type": "forward_and_backward",
+            "note_type": "basic_and_reversed",
             "deck_name": "Ankify Test Deck",
         }
     )

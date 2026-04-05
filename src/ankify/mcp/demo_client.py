@@ -8,7 +8,7 @@ Hello World!\tHallo Welt!\tEng\tGe
 Как дела?\t¿Cómo estás?\tRus\tSpanish
 كم تبلغ من العمر؟\t你今年多大\tArabic\tChinese
 """
-    note_type = "forward_and_backward"
+    note_type = "basic_and_reversed"
     deck_name = "Ankify Test Deck"
 
     result = await client.call_tool(
@@ -35,7 +35,7 @@ async def get_prompt__vocab(client):
         {
             "language_studied": "English",
             "language_known": "German",
-            "note_type": "forward_and_backward",
+            "note_type": "basic_and_reversed",
             "custom_instructions": "Some custom instructions...",
         },
     )

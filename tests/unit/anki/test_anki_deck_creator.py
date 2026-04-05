@@ -41,23 +41,23 @@ class TestAnkiDeckCreator:
             ),
         ]
 
-    def test_creator_forward_only_model(self, tmp_path):
-        """Creator creates forward_only model with one template."""
+    def test_creator_basic_model(self, tmp_path):
+        """Creator creates basic model with one template."""
         output_file = tmp_path / "test.apkg"
-        creator = AnkiDeckCreator(output_file, "Test", "forward_only")
+        creator = AnkiDeckCreator(output_file, "Test", "basic")
 
-        # forward_only should have 1 template
+        # basic should have 1 template
         assert len(creator.anki_note_model.templates) == 1
-        assert creator.anki_note_model.name == "Ankify_forward_only"
+        assert creator.anki_note_model.name == "Ankify Basic"
 
-    def test_creator_forward_and_backward_model(self, tmp_path):
-        """Creator creates forward_and_backward model with two templates."""
+    def test_creator_basic_and_reversed_model(self, tmp_path):
+        """Creator creates basic_and_reversed model with two templates."""
         output_file = tmp_path / "test.apkg"
-        creator = AnkiDeckCreator(output_file, "Test", "forward_and_backward")
+        creator = AnkiDeckCreator(output_file, "Test", "basic_and_reversed")
 
-        # forward_and_backward should have 2 templates
+        # basic_and_reversed should have 2 templates
         assert len(creator.anki_note_model.templates) == 2
-        assert creator.anki_note_model.name == "Ankify_forward_and_backward"
+        assert creator.anki_note_model.name == "Ankify Basic & Reversed"
 
     def test_creator_invalid_note_type_raises(self, tmp_path):
         """Creator raises ValueError for invalid note type."""
@@ -69,7 +69,7 @@ class TestAnkiDeckCreator:
     def test_write_anki_deck_creates_file(self, tmp_path, sample_entries):
         """write_anki_deck creates .apkg file."""
         output_file = tmp_path / "output.apkg"
-        creator = AnkiDeckCreator(output_file, "Test Deck", "forward_only")
+        creator = AnkiDeckCreator(output_file, "Test Deck", "basic")
 
         creator.write_anki_deck(sample_entries)
 
@@ -80,7 +80,7 @@ class TestAnkiDeckCreator:
     def test_write_anki_deck_empty_vocab(self, tmp_path):
         """write_anki_deck handles empty vocabulary."""
         output_file = tmp_path / "output.apkg"
-        creator = AnkiDeckCreator(output_file, "Test Deck", "forward_only")
+        creator = AnkiDeckCreator(output_file, "Test Deck", "basic")
 
         creator.write_anki_deck([])
 
@@ -90,7 +90,7 @@ class TestAnkiDeckCreator:
     def test_write_anki_deck_creates_parent_dirs(self, tmp_path, sample_entries):
         """write_anki_deck creates parent directories if needed."""
         output_file = tmp_path / "nested" / "dir" / "output.apkg"
-        creator = AnkiDeckCreator(output_file, "Test Deck", "forward_only")
+        creator = AnkiDeckCreator(output_file, "Test Deck", "basic")
 
         creator.write_anki_deck(sample_entries)
 
@@ -99,7 +99,7 @@ class TestAnkiDeckCreator:
     def test_model_has_six_fields(self, tmp_path):
         """Note model has all six required fields."""
         output_file = tmp_path / "test.apkg"
-        creator = AnkiDeckCreator(output_file, "Test", "forward_only")
+        creator = AnkiDeckCreator(output_file, "Test", "basic")
 
         field_names = [f["name"] for f in creator.anki_note_model.fields]
         expected = ["Front", "Back", "Front language", "Back language", "Front sound", "Back sound"]
@@ -122,7 +122,7 @@ class TestAnkiDeckCreatorNotes:
         """_create_anki_note creates genanki.Note with correct fields."""
         front_audio, back_audio = temp_audio_files
         output_file = tmp_path / "test.apkg"
-        creator = AnkiDeckCreator(output_file, "Test", "forward_only")
+        creator = AnkiDeckCreator(output_file, "Test", "basic")
 
         entry = VocabEntry(
             front="Hello",
@@ -146,7 +146,7 @@ class TestAnkiDeckCreatorNotes:
         """Created note has a GUID."""
         front_audio, back_audio = temp_audio_files
         output_file = tmp_path / "test.apkg"
-        creator = AnkiDeckCreator(output_file, "Test", "forward_only")
+        creator = AnkiDeckCreator(output_file, "Test", "basic")
 
         entry = VocabEntry(
             front="Hello",
@@ -179,7 +179,7 @@ class TestAnkiDeckCreatorPackaging:
         """Written deck package includes media files."""
         front_audio, back_audio = temp_audio_files
         output_file = tmp_path / "output.apkg"
-        creator = AnkiDeckCreator(output_file, "Test Deck", "forward_only")
+        creator = AnkiDeckCreator(output_file, "Test Deck", "basic")
 
         entry = VocabEntry(
             front="Hello",
@@ -215,6 +215,6 @@ class TestGenankinSortTypeFix:
         """_fix_genanki_sort_type is called during initialization."""
         mock_fix = mocker.patch.object(AnkiDeckCreator, "_fix_genanki_sort_type")
         output_file = tmp_path / "test.apkg"
-        AnkiDeckCreator(output_file, "Test", "forward_only")
+        AnkiDeckCreator(output_file, "Test", "basic")
 
         mock_fix.assert_called_once()

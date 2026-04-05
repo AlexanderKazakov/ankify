@@ -55,7 +55,7 @@ class TestAnkiGuidGenerator:
 
     def test_hash_based_int_guid_is_positive(self):
         """hash_based_int_guid returns positive integer."""
-        test_inputs = ["", "a", "test", "Ankify_forward_only", "very_long_string" * 100]
+        test_inputs = ["", "a", "test", "Ankify Basic", "very_long_string" * 100]
         for data in test_inputs:
             guid = AnkiGuidGenerator.hash_based_int_guid(data)
             assert guid > 0
@@ -78,7 +78,7 @@ class TestAnkiGuidGenerator:
     def test_hash_based_base91_guid_uses_valid_alphabet(self):
         """hash_based_base91_guid uses only characters from Anki base91 alphabet."""
         valid_chars = set(AnkiGuidGenerator._ANKI_BASE91_TABLE)
-        test_inputs = ["model1", "model2", "Ankify_forward_only"]
+        test_inputs = ["model1", "model2", "Ankify Basic"]
         for data in test_inputs:
             guid = AnkiGuidGenerator.hash_based_base91_guid(data)
             for char in guid:

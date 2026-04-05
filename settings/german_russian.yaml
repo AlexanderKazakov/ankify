@@ -19,8 +19,8 @@ language_studied: German
 language_known: Russian
 
 # The type of notes to create. Should be consistent with the LLM prompt.
-# One of: "forward_and_backward" or "forward_only"
-note_type: forward_and_backward
+# One of: "basic_and_reversed" or "basic"
+note_type: basic_and_reversed
 
 # LLM settings and prompt.
 # The LLM prompt should be consistent with the note_type and with the languages

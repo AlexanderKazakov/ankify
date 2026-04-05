@@ -159,7 +159,12 @@ class MLflowConfig(StrictModel):
     )
 
 
-NoteType = Literal["forward_and_backward", "forward_only"]
+NoteType = Literal["basic", "basic_and_reversed"]
+
+ANKIFY_NOTE_TYPE_MODEL_NAME: dict[NoteType, str] = {
+    "basic": "Ankify Basic",
+    "basic_and_reversed": "Ankify Basic & Reversed",
+}
 
 
 class Settings(BaseSettings):
@@ -218,11 +223,13 @@ class Settings(BaseSettings):
         description="If true, interactively confirm key steps before proceeding.",
     )
 
-    language_studied: str = Field(description="Target language being studied (e.g., German).")
+    language_studied: str = Field(
+        description="Target language being studied (e.g., German)."
+    )
     language_known: str = Field(description="Known/native language (e.g., English).")
 
     note_type: NoteType = Field(
-        default="forward_and_backward",
+        default="basic_and_reversed",
         description="Type of Anki notes to create.",
     )
 

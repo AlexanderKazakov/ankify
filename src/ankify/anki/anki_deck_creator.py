@@ -6,7 +6,7 @@ from importlib import resources
 
 from ..vocab_entry import VocabEntry
 from ..logging import get_logger
-from ..settings import NoteType
+from ..settings import ANKIFY_NOTE_TYPE_MODEL_NAME, NoteType
 
 
 class AnkiDeckCreator:
@@ -90,7 +90,7 @@ class AnkiDeckCreator:
             {"name": "Back sound"},
         ]
 
-        if note_type == "forward_and_backward":
+        if note_type == "basic_and_reversed":
             templates = [
                 {
                     "name": "Forward Card",
@@ -103,7 +103,7 @@ class AnkiDeckCreator:
                     "afmt": backward_afmt,
                 },
             ]
-        elif note_type == "forward_only":
+        elif note_type == "basic":
             templates = [
                 {
                     "name": "Forward Card",
@@ -114,7 +114,7 @@ class AnkiDeckCreator:
         else:
             raise ValueError(f"Invalid note type: {note_type}")
 
-        model_name = f"Ankify_{note_type}"
+        model_name = ANKIFY_NOTE_TYPE_MODEL_NAME[note_type]
         model = genanki.Model(
             model_id=AnkiGuidGenerator.hash_based_int_guid(model_name),
             name=model_name,

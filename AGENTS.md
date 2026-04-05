@@ -32,8 +32,11 @@ uv sync --all-extras
 uv run ruff check src/
 uv run ruff format src/
 
-# Tests
+# All Tests (you most probably don't need to run all tests, see below)
 uv run pytest
+
+## Fast Tests (if you haven't touched TTS code, skip the TTS tests)
+uv run python -m pytest tests/ --ignore=tests/unit/tts/test_tts_providers.py
 ```
 
 ## Rules

@@ -19,8 +19,8 @@ language_studied: English
 language_known: Russian
 
 # The type of notes to create. Should be consistent with the LLM prompt.
-# One of: "forward_and_backward" or "forward_only"
-note_type: forward_only
+# One of: "basic_and_reversed" or "basic"
+note_type: basic
 
 # LLM settings and prompt.
 # The LLM prompt should be consistent with the note_type and with the languages
@@ -31,7 +31,7 @@ llm:
     reasoning_effort: high
     prompt_template: ./settings/prompts/prompt_template.md.j2
     custom_instructions: ./settings/prompts/custom_instructions/english_russian_c1.md
-    few_shot_examples: ./settings/prompts/few_shot_examples/forward_only_english_russian_c1
+    few_shot_examples: ./settings/prompts/few_shot_examples/basic_english_russian_c1
 # tts:
 # default_provider: aws
 # default_provider: azure

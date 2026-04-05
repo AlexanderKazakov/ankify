@@ -13,23 +13,23 @@ Each Anki note contains:
 
 ### Note Types
 
-| Type                     | Cards                  | Use Case                  |
-| ------------------------ | ---------------------- | ------------------------- |
-| `forward_and_backward` | 2 (Forward + Backward) | Remember both directions  |
-| `forward_only`         | 1 (Forward only)       | Remember Back given Front |
+| Config / tool value (`note_type`) | Anki model name           | MCP shorthand | Cards                  | Use Case                  |
+| --------------------------------- | ------------------------- | ------------- | ---------------------- | ------------------------- |
+| `basic_and_reversed`              | Ankify Basic & Reversed   | `br`          | 2 (Forward + Backward) | Remember both directions  |
+| `basic`                           | Ankify Basic              | `ba`          | 1 (Forward only)       | Remember Back given Front |
 
 See [Anki documentation](https://docs.ankiweb.net/getting-started.html#notes--fields) for Notes vs Cards explanation.
 
 ### TSV Format by Note Type
 
-**`forward_and_backward`** - LLM creates one-directional translations:
+**`basic_and_reversed`** - LLM creates one-directional translations:
 
 ```tsv
 jemanden abholen	to pick someone up	German	English
 der Bahnsteig	train platform	German	English
 ```
 
-**`forward_only`** - LLM creates bidirectional translations:
+**`basic`** - LLM creates bidirectional translations:
 
 ```tsv
 jemanden abholen	to pick someone up	German	English
