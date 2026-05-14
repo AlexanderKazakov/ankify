@@ -126,8 +126,13 @@ Deploy to AWS Lambda for hosted MCP access. See [infra/README.md](infra/README.m
 
 **Prompts:**
 
+- `ankify` - Recommended prompt "Read and follow the packaged Ankify skill exposed by the MCP server"
 - `vocab` - Create vocabulary table (universal template for any language pair, note type, custom instructions)
 - `deck` - Create Anki deck from vocabulary table (instructs AI to use the conversion tool properly)
+
+**Resources:**
+
+- `skill://anki-vocabulary-builder/SKILL.md` - Packaged Ankify skill instructions exposed through FastMCP's skill provider (can also be copied and used as a normal `SKILL.md` skill)
 
 **Tools:**
 

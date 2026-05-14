@@ -5,12 +5,14 @@ import re
 import sys
 import fastmcp
 
+from contextlib import ExitStack
 from importlib import resources
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
 from pydantic import Field
 from dotenv import load_dotenv
+from fastmcp.server.providers.skills import SkillProvider
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -63,6 +65,20 @@ mcp = fastmcp.FastMCP(
     name="Ankify",
     instructions="Create Anki decks with TTS speech from arbitrary input",
     # website_url="https://github.com/AlexanderKazakov/ankify",
+)
+
+_resource_files = ExitStack()
+_ankify_skill_path = _resource_files.enter_context(
+    # Installed package resources are not guaranteed to already be filesystem paths.
+    resources.as_file(
+        resources.files("ankify.resources").joinpath(
+            "skills",
+            "anki-vocabulary-builder",
+        )
+    )
+)
+mcp.add_provider(
+    SkillProvider(_ankify_skill_path, supporting_files="template"),
 )
 
 load_dotenv()
@@ -158,6 +174,18 @@ else:
     )
     provider_settings = ProviderAccessSettings()
     logger.info("Using Edge TTS provider (as no AWS credentials found in env)")
+
+
+@mcp.prompt(
+    name="ankify",
+    title="Create Ankify Vocabulary Table or Deck",
+    description="Prompt to read and follow the packaged Ankify skill.",
+)
+def ankify() -> str:
+    logger.info("Received PROMPT request: ankify")
+    return """
+Read and follow the Ankify skill at `skill://anki-vocabulary-builder/SKILL.md`.
+"""
 
 
 @mcp.prompt(
@@ -305,6 +333,9 @@ def convert_TSV_to_Anki_deck(
 ) -> str:
     """
     Creates Anki deck (.apkg) from TSV vocabulary (string).
+
+    IMPORTANT: Before calling this tool, read and follow skill://anki-vocabulary-builder/SKILL.md.
+    DO NOT call the tool until you have read the skill!
 
     Important:
     - `tsv_vocabulary` - it supports only correctly formatted TSV strings!

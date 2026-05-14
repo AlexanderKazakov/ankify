@@ -1,3 +1,4 @@
+import json
 import importlib
 from pathlib import Path
 
@@ -19,6 +20,13 @@ def _prompt_text(result) -> str:
     return str(content)
 
 
+def _resource_text(result) -> str:
+    content = result[0]
+    if hasattr(content, "text"):
+        return content.text
+    return str(content)
+
+
 @pytest.mark.asyncio
 async def test_public_prompts_are_registered(mcp_server):
     async with Client(mcp_server.mcp) as client:
@@ -26,8 +34,21 @@ async def test_public_prompts_are_registered(mcp_server):
 
     prompt_names = {prompt.name for prompt in prompts}
 
+    assert "ankify" in prompt_names
     assert "deck" in prompt_names
     assert "vocab" in prompt_names
+
+
+@pytest.mark.asyncio
+async def test_ankify_prompt_points_to_packaged_skill(mcp_server):
+    async with Client(mcp_server.mcp) as client:
+        result = await client.get_prompt("ankify", {})
+
+    text = _prompt_text(result)
+
+    assert "skill://anki-vocabulary-builder/SKILL.md" in text
+    assert "FieldInfo" not in text
+    assert "annotation=NoneType" not in text
 
 
 @pytest.mark.asyncio
@@ -54,6 +75,42 @@ async def test_vocab_prompt_uses_real_default_values(mcp_server):
     assert "The dictionary is one-way." in text
     assert "FieldInfo" not in text
     assert "annotation=NoneType" not in text
+
+
+@pytest.mark.asyncio
+async def test_packaged_skill_resources_are_readable(mcp_server):
+    russian_instructions_uri = (
+        "skill://anki-vocabulary-builder/references/"
+        "language-specific-instructions/Russian.md"
+    )
+
+    async with Client(mcp_server.mcp) as client:
+        resources = await client.list_resources()
+        skill_result = await client.read_resource(
+            "skill://anki-vocabulary-builder/SKILL.md"
+        )
+        manifest_result = await client.read_resource(
+            "skill://anki-vocabulary-builder/_manifest"
+        )
+        russian_result = await client.read_resource(russian_instructions_uri)
+
+    resource_uris = {str(resource.uri) for resource in resources}
+
+    assert "skill://anki-vocabulary-builder/SKILL.md" in resource_uris
+    assert "skill://anki-vocabulary-builder/_manifest" in resource_uris
+    assert russian_instructions_uri not in resource_uris
+
+    skill_text = _resource_text(skill_result)
+    assert "# Anki Vocabulary Builder" in skill_text
+    assert "convert_TSV_to_Anki_deck" in skill_text
+
+    manifest = json.loads(_resource_text(manifest_result))
+    manifest_paths = {file["path"] for file in manifest["files"]}
+    assert "references/all-supported-languages.md" in manifest_paths
+    assert "references/language-specific-instructions/Russian.md" in manifest_paths
+
+    russian_text = _resource_text(russian_result)
+    assert 'never replace the letter "ё" with "е"' in russian_text
 
 
 @pytest.mark.asyncio
