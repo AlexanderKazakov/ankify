@@ -38,6 +38,7 @@ def _configure_logging_for_runtime(
     )
     fastmcp.utilities.logging.configure_logging(level=level, logger=logger)
 
+
 logger = fastmcp.utilities.logging.get_logger(__name__)
 
 # Configure the 'ankify' logger to use FastMCP's logging infrastructure
