@@ -5,6 +5,7 @@ Create Anki decks with text-to-speech audio from arbitrary input using LLM and T
 ## Features
 
 - **MCP Server**: Use with any MCP-compatible AI client, locally or in the cloud. No need for any API keys
+- **Agent Skill**: `src/ankify/resources/skills/anki-vocabulary-builder/` - the standard `SKILL.md`-format folder you can copy to your agent's skills
 - **CLI**: Standalone command-line tool, uses LLM through openai-compatible API
 - **Multi-language TTS**: Azure, AWS Polly, and free Edge TTS support
 - **Customizable prompts**: Curated vocabulary creation prompt templates for any language pair and note type with few-shot examples and custom instructions

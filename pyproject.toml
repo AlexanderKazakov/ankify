@@ -68,6 +68,7 @@ include = [
   "src/ankify/resources/*.json",
   "src/ankify/resources/prompts/*.j2",
   "src/ankify/resources/prompts/language_specific/*.md",
+  "src/ankify/resources/skills",
   "src/ankify/resources/tts/*.json",
 ]
 
@@ -78,5 +79,6 @@ include = [
   "src/ankify/resources/*.json",
   "src/ankify/resources/prompts/*.j2",
   "src/ankify/resources/prompts/language_specific/*.md",
+  "src/ankify/resources/skills",
   "src/ankify/resources/tts/*.json",
 ]
