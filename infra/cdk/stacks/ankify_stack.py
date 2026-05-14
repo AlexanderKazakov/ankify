@@ -79,7 +79,6 @@ class AnkifyStack(Stack):
                 "ANKIFY_PRESIGNED_URL_EXPIRY": "86400",
                 "ANKIFY_AZURE_SECRET_ARN": azure_secret.secret_arn,
                 "ANKIFY__PROVIDERS__AZURE__REGION": azure_region,
-                "FASTMCP_ENABLE_RICH_LOGGING": "false",
             },
         )
 

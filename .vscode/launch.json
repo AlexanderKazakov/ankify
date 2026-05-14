@@ -11,14 +11,39 @@
             "python": "${workspaceFolder}/.venv/bin/python"
         },
         {
-            "name": "pytest",
+            "name": "pytest: non-tts tests (fast)",
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "args": [
-                "tests/unit/tts/test_tts_providers.py::test_tts_provider_audio_transcribes_to_expected_text"
+                "tests/",
+                "--ignore=tests/unit/tts"
+            ],
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "pytest: tts tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": [
+                "tests/unit/tts"
+            ],
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "pytest: all tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": [
+                "tests/"
             ],
             "python": "${workspaceFolder}/.venv/bin/python"
         },

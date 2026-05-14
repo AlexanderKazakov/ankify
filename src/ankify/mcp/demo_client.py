@@ -2,6 +2,13 @@ import asyncio
 from fastmcp import Client
 
 
+def prompt_text(result):
+    content = result.messages[0].content
+    if hasattr(content, "text"):
+        return content.text
+    return str(content)
+
+
 async def call_tool__convert_TSV_to_Anki_deck(client):
     tsv_vocabulary = """
 Hello World!\tHallo Welt!\tEng\tGe
@@ -22,15 +29,15 @@ Hello World!\tHallo Welt!\tEng\tGe
     print(result)
 
 
-async def list_prompts_mcp(client):
-    result = await client.list_prompts_mcp()
-    for prompt in result.prompts:
+async def list_prompts(client):
+    result = await client.list_prompts()
+    for prompt in result:
         print(prompt)
         print()
 
 
 async def get_prompt__vocab(client):
-    result = await client.get_prompt_mcp(
+    result = await client.get_prompt(
         "vocab",
         {
             "language_studied": "English",
@@ -39,37 +46,37 @@ async def get_prompt__vocab(client):
             "custom_instructions": "Some custom instructions...",
         },
     )
-    print(result.messages)
+    print(prompt_text(result))
     print()
 
 
 async def get_prompt__vocab__with_defaults(client):
-    result = await client.get_prompt_mcp("vocab", {})
-    print(result.messages)
+    result = await client.get_prompt("vocab", {})
+    print(prompt_text(result))
     print()
 
 
 async def get_prompt__deck(client):
-    result = await client.get_prompt_mcp(
+    result = await client.get_prompt(
         "deck",
         {
             "deck_name": "Ankify Test Deck",
         },
     )
-    print(result.messages)
+    print(prompt_text(result))
     print()
 
 
 async def get_prompt__deck__with_defaults(client):
-    result = await client.get_prompt_mcp("deck", {})
-    print(result.messages)
+    result = await client.get_prompt("deck", {})
+    print(prompt_text(result))
     print()
 
 
 async def main(client):
     async with client:
         print("Listing prompts...")
-        await list_prompts_mcp(client)
+        await list_prompts(client)
         print("-" * 100 + "\n\n")
         print("Getting prompt for vocab...")
         await get_prompt__vocab(client)

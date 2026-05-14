@@ -9,9 +9,7 @@ from importlib import resources
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
-from typing import Any
 from pydantic import Field
-from pydantic.fields import FieldInfo
 from dotenv import load_dotenv
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -30,52 +28,15 @@ from ankify.tts.tts_manager import TTSManager
 from ankify.vocab_entry import VocabEntry
 
 
-# =============================================================================
-# TEMPORARY PATCH: enable_rich_logging support (from fastmcp PR #2893)
-# https://github.com/jlowin/fastmcp/commit/81cbb9bee280f58ce45e98871bea8f083ff08049
-# Remove this once fastmcp releases this feature in stable
-# =============================================================================
-def _configure_logging_patched(
+def _configure_logging_for_runtime(
     level: str | int = "INFO",
     logger: logging.Logger | None = None,
-    enable_rich_logging: bool = True,
 ) -> None:
-    """
-    Patched configure_logging that supports enable_rich_logging flag.
-    When enable_rich_logging=False, uses standard Python logging without rich formatting.
-    """
-    if logger is None:
-        logger = logging.getLogger("fastmcp")
-
-    logger.propagate = False
-    logger.setLevel(level)
-
-    # Remove any existing handlers to avoid duplicates on reconfiguration
-    for hdlr in logger.handlers[:]:
-        logger.removeHandler(hdlr)
-
-    # Use standard logging handlers if rich logging is disabled
-    if not enable_rich_logging:
-        handler = logging.StreamHandler()
-        handler.setFormatter(
-            logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s")
-        )
-        logger.addHandler(handler)
-        return
-
-    # Otherwise, use the original fastmcp configure_logging for rich output
+    # Rich terminal formatting is helpful locally but noisy in Lambda CloudWatch logs.
+    fastmcp.settings.enable_rich_logging = not bool(
+        os.environ.get("AWS_LAMBDA_FUNCTION_NAME")
+    )
     fastmcp.utilities.logging.configure_logging(level=level, logger=logger)
-
-
-# =============================================================================
-
-
-# Control rich logging via environment variable (default: enabled)
-ENABLE_RICH_LOGGING = os.environ.get("FASTMCP_ENABLE_RICH_LOGGING", "true").lower() in (
-    "true",
-    "1",
-    "yes",
-)
 
 logger = fastmcp.utilities.logging.get_logger(__name__)
 
@@ -86,17 +47,15 @@ logger = fastmcp.utilities.logging.get_logger(__name__)
 #     logger=logging.getLogger("ankify"),
 # )
 
-_configure_logging_patched(
+_configure_logging_for_runtime(
     level="INFO",
     logger=logging.getLogger("ankify"),
-    enable_rich_logging=ENABLE_RICH_LOGGING,
 )
 
 # Also apply to the main fastmcp logger
-_configure_logging_patched(
+_configure_logging_for_runtime(
     level="INFO",
     logger=logging.getLogger("fastmcp"),
-    enable_rich_logging=ENABLE_RICH_LOGGING,
 )
 
 mcp = fastmcp.FastMCP(
@@ -200,12 +159,6 @@ else:
     logger.info("Using Edge TTS provider (as no AWS credentials found in env)")
 
 
-def _fix_field_default_fastmcp_bug(value: Any) -> Any:
-    if isinstance(value, FieldInfo):
-        return value.default
-    return value
-
-
 @mcp.prompt(
     title="Create Anki Deck",
     description="Prompt to create Anki deck file from the vocabulary table. "
@@ -218,7 +171,6 @@ def deck(
         description="Deck name (it's not the file name, it's the deck name within Anki)",
     ),
 ) -> str:
-    deck_name = _fix_field_default_fastmcp_bug(deck_name)
     logger.info(
         "Received PROMPT request: deck: deck_name '%s'",
         deck_name,
@@ -295,10 +247,6 @@ def vocab(
         language_known,
         note_type,
     )
-    language_studied = _fix_field_default_fastmcp_bug(language_studied)
-    language_known = _fix_field_default_fastmcp_bug(language_known)
-    note_type = _fix_field_default_fastmcp_bug(note_type)
-    custom_instructions = _fix_field_default_fastmcp_bug(custom_instructions)
 
     note_type_raw = note_type.lower().strip()
     if note_type_raw == "ba":
@@ -435,81 +383,66 @@ def package_anki_deck(
     return output_file
 
 
+def _prompt_result_text(result) -> str:
+    # MCP prompt content can be a typed text block or a plain string, depending on client API.
+    content = result.messages[0].content
+    if hasattr(content, "text"):
+        return content.text
+    return str(content)
+
+
 async def _test_vocab() -> None:
-    with open("tmp/vocab_en_ru_ba.md", "w", encoding="utf-8") as f:
-        f.write(
-            (
-                await vocab.render(
-                    {
-                        "language_studied": "English",
-                        "language_known": "Russian",
-                        "note_type": "basic",
-                    }
-                )
-            )[0].content.text
-        )
-    with open("tmp/vocab_en_ru_br.md", "w", encoding="utf-8") as f:
-        f.write(
-            (
-                await vocab.render(
-                    {
-                        "language_studied": "eng",
-                        "language_known": "ru",
-                        "note_type": "basic and reversed",
-                        "custom_instructions": "Some custom instructions...",
-                    }
-                )
-            )[0].content.text
-        )
-    with open("tmp/vocab_ge_en_br.md", "w", encoding="utf-8") as f:
-        f.write(
-            (
-                await vocab.render(
-                    {
-                        "language_studied": "ger",
-                        "language_known": "en",
-                        "note_type": "basic_and_reversed",
-                    }
-                )
-            )[0].content.text
-        )
-    with open("tmp/vocab_ge_en_ba.md", "w", encoding="utf-8") as f:
-        f.write(
-            (
-                await vocab.render(
-                    {
-                        "language_studied": "de",
-                        "language_known": "eng",
-                        "note_type": "ba",
-                    }
-                )
-            )[0].content.text
-        )
-    with open("tmp/vocab_ar_tr_br.md", "w", encoding="utf-8") as f:
-        f.write(
-            (
-                await vocab.render(
-                    {
-                        "language_studied": "ar",
-                        "language_known": "tr",
-                        "note_type": "br",
-                    }
-                )
-            )[0].content.text
-        )
+    prompts_to_render = {
+        "vocab_en_ru_ba.md": {
+            "language_studied": "English",
+            "language_known": "Russian",
+            "note_type": "basic",
+        },
+        "vocab_en_ru_br.md": {
+            "language_studied": "eng",
+            "language_known": "ru",
+            "note_type": "basic and reversed",
+            "custom_instructions": "Some custom instructions...",
+        },
+        "vocab_ge_en_br.md": {
+            "language_studied": "ger",
+            "language_known": "en",
+            "note_type": "basic_and_reversed",
+        },
+        "vocab_ge_en_ba.md": {
+            "language_studied": "de",
+            "language_known": "eng",
+            "note_type": "ba",
+        },
+        "vocab_ar_tr_br.md": {
+            "language_studied": "ar",
+            "language_known": "tr",
+            "note_type": "br",
+        },
+    }
+
+    async with fastmcp.Client(mcp) as client:
+        for output_name, arguments in prompts_to_render.items():
+            result = await client.get_prompt("vocab", arguments)
+            Path("tmp", output_name).write_text(
+                _prompt_result_text(result),
+                encoding="utf-8",
+            )
 
 
 async def _test_convert_TSV_to_Anki_deck() -> None:
-    result = await convert_TSV_to_Anki_deck.run(
-        {
-            "tsv_vocabulary": """Hello World!\tHallo Welt!\tEng\tGe
+    async with fastmcp.Client(mcp) as client:
+        result = await client.call_tool(
+            "convert_TSV_to_Anki_deck",
+            {
+                "tsv_vocabulary": """Hello World!\tHallo Welt!\tEng\tGe
 Как дела?\t¿Cómo estás?\tRus\tSpanish
 كم تبلغ من العمر؟\t你今年多大\tArabic\tChinese""",
-            "note_type": "basic_and_reversed",
-            "deck_name": "Ankify Test Deck",
-        }
-    )
-    logger.info("Ankify Test Deck: %s", result.content[0].text)
+                "note_type": "basic_and_reversed",
+                "deck_name": "Ankify Test Deck",
+            },
+        )
+    logger.info("Ankify Test Deck: %s", result.data or result.content[0].text)
 
 
 async def _test_all() -> None:
