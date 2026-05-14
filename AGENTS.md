@@ -39,6 +39,9 @@ uv run pytest
 uv run python -m pytest tests/ --ignore=tests/unit/tts/test_tts_providers.py
 ```
 
+Full TTS provider tests require GStreamer because Azure Speech SDK uses it to
+read compressed MP3 audio during speech-to-text verification.
+
 ## Rules
 
 ### Permissions & Automation

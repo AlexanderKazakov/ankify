@@ -60,6 +60,24 @@ Run all tests:
 uv run pytest
 ```
 
+The full TTS provider test (`tests/unit/tts/test_tts_providers.py`) generates MP3
+audio and asks Azure Speech-to-Text to transcribe it back. Azure Speech SDK needs
+GStreamer at runtime to read compressed audio such as MP3. Microsoft documents
+this compressed-audio GStreamer setup for Linux and Windows:
+https://learn.microsoft.com/azure/ai-services/speech-service/how-to-use-codec-compressed-audio-input-streams
+
+Install GStreamer before running those tests on Linux:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+```
+
+CI already installs GStreamer before running the full test suite. On macOS,
+Homebrew GStreamer can be installed and still not be visible to Azure Speech SDK
+for compressed MP3 input, so run the full TTS provider test in Linux/CI only,
+TTS tests do not work on Mac for now.
+
 Run a single test directory, file, or test:
 ```bash
 uv run pytest tests/path/to/test_directory -v

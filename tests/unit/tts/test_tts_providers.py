@@ -89,10 +89,14 @@ def _normalize_text(text: str) -> str:
 
 
 def _similarity_ratio(expected: str, actual: str) -> float:
-    return SequenceMatcher(None, _normalize_text(expected), _normalize_text(actual)).ratio()
+    return SequenceMatcher(
+        None, _normalize_text(expected), _normalize_text(actual)
+    ).ratio()
 
 
-def _provider_access(provider: str, request: pytest.FixtureRequest) -> ProviderAccessSettings:
+def _provider_access(
+    provider: str, request: pytest.FixtureRequest
+) -> ProviderAccessSettings:
     if provider == "aws":
         return ProviderAccessSettings(aws=request.getfixturevalue("aws_access"))
     if provider == "azure":
@@ -112,8 +116,12 @@ def test_tts_provider_audio_transcribes_to_expected_text(
 ):
     category, language, text, transcribe_language_code = test_case
     provider_access = _provider_access(provider, request)
+    AzureSTTHelper.require_mp3_support()
+
     config = DefaultTTSConfigurator(default_provider=provider).get_config(language)
-    client, resolved_provider = create_tts_single_language_client(config, provider_access)
+    client, resolved_provider = create_tts_single_language_client(
+        config, provider_access
+    )
 
     assert resolved_provider == provider
 
