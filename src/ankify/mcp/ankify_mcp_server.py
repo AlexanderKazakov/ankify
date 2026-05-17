@@ -63,7 +63,12 @@ _configure_logging_for_runtime(
 
 mcp = fastmcp.FastMCP(
     name="Ankify",
-    instructions="Create Anki decks with TTS speech from arbitrary input",
+    instructions=(
+        "Create Anki decks with TTS speech from arbitrary input. "
+        "This server publishes its workflow instructions as MCP resources under the "
+        "skill:// URI scheme. Always fetch them via your MCP resource-reading tool "
+        "against server ankify - they are not local files and are not local skills."
+    ),
     # website_url="https://github.com/AlexanderKazakov/ankify",
 )
 
@@ -184,8 +189,12 @@ else:
 def ankify() -> str:
     logger.info("Received PROMPT request: ankify")
     return """
-Read and follow the Ankify skill at `skill://anki-vocabulary-builder/SKILL.md`.
-"""
+Create Anki deck from the context. \
+Read and follow the Ankify skill at `skill://anki-vocabulary-builder/SKILL.md`. \
+It is not a local file and is not a local skill. \
+The MCP server publishes its workflow instructions as MCP resources under the skill:// URI scheme. \
+Fetch them via your MCP resource-reading tool against server ankify.
+""".strip()
 
 
 @mcp.prompt(
@@ -334,8 +343,12 @@ def convert_TSV_to_Anki_deck(
     """
     Creates Anki deck (.apkg) from TSV vocabulary (string).
 
-    IMPORTANT: Before calling this tool, read and follow skill://anki-vocabulary-builder/SKILL.md.
-    DO NOT call the tool until you have read the skill!
+    IMPORTANT: Before calling this tool, read and follow the MCP resource
+    skill://anki-vocabulary-builder/SKILL.md exposed by this same server (ankify).
+    Fetch it via your MCP resource-reading tool (e.g. ReadMcpResourceTool with
+    server="ankify"). It is NOT a file on disk - do not search the filesystem,
+    and do not confuse it with local or built-in skills.
+    DO NOT call the tool until you have read it.
 
     Important:
     - `tsv_vocabulary` - it supports only correctly formatted TSV strings!

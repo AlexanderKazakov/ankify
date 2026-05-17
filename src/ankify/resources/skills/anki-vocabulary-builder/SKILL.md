@@ -39,17 +39,19 @@ The order of words is not important. It is not necessary to put them in alphabet
 
 The purpose of this dictionary is to be used in the Anki app to memorize translations. The dictionary should contain words, short fixed phrases, and useful sentence constructions if there are any in the provided text. Do not always blindly split the provided sentences into separate words - try to understand - maybe it's a fixed phrase or a useful grammar being learnt.
 
-Never use any abbreviations, such as 'sth.', 'smb.', 'напр.', 'что-л.', 'т.п.', 'тех.', 'поэтич.', 'tech.', 'etw.', 'Dat.'! Always write whole words in the language of the phrase, like 'something', 'somebody', 'например', 'что-либо', 'тому подобное', 'etwas', 'Dativ', etc.
+Never use any abbreviations, such as 'sth.', 'smb.', 'напр.', 'что-л.', 'т.п.', 'тех.', 'поэтич.', 'tech.', 'etw.', 'Dat.'! Always write whole words in the language of the phrase, like 'something', 'somebody', 'например', 'что-либо', 'тому подобное', 'etwas', 'Dativ', and so on. Do not use 'e.g.' - just use parentheses instead.
 
 Try to spare words when it doesn't hurt the meaning. As an example, instead of something like `to build something, to create something` you should write `to build, to create something` - that is way more comfortable to learn. 
 
 Never mix languages within a single cell. Never, even when it seems convenient for clarifying a translation. More than one language in a cell will break the subsequent text-to-speech step. Only one language within a cell!
 
-Think deeply about every translation. If there are several synonyms, slightly enrich their translations so that it's clear how they differ. If a translation has a very broad meaning, extend it a little to make it more precise. But overall, keep translations concise. This is not a thesaurus, but a vocabulary for learning. You have to choose clear, precise, concise, and common translations. Do not write several synonyms for a word when it's not necessary. Near-paraphrases do not count as useful synonyms. Synonyms must add coverage of a different shade of meaning, register, or domain — not just rephrase the same idea. Maintain the adequate balance between conciseness and precision. This is a very difficult task to do it properly, so think deeply on each table row!
+Think deeply about every translation. If there are several synonyms, slightly enrich their translations so that it's clear how they differ. If a translation has a very broad meaning, extend it a little to make it more precise. But overall, keep translations concise. This is not a thesaurus, but a vocabulary for learning. You have to choose clear, precise, concise, and common translations. Do not write several synonyms for a word when it's not necessary. Near-paraphrases do not count as useful synonyms. Synonyms must add coverage of a different shade of meaning, register, or domain — not just rephrase the same idea. As a soft cap, keep to no more than 2 comma-separated synonyms per sense. A third synonym is only justified if it adds a genuinely distinct shade — otherwise drop it.
 
-Verbs must always be in the infinitive form unless they are part of a fixed phrase where they are conjugated. Whenever possible, include the corresponding preposition along with a verb, for example, "to speak about" is better than just "to speak". 
+Maintain the adequate balance between conciseness and precision. This is a very difficult task to do it properly, so think deeply on each table row!
 
-Maintain translation consistency: an infinitive must be translated to an infinitive, a fixed phrase must be translated to a fixed phrase, etc.
+Verbs must always be in the infinitive form unless they are part of a fixed phrase where they are conjugated. Whenever possible, include the corresponding preposition along with a verb, for example, "to speak about" is better than just "to speak".
+
+Maintain translation consistency: an infinitive must be translated to an infinitive, a fixed phrase must be translated to a fixed phrase, a sentence to a sentence, and so on.
 
 Note that the user input may contain orthographical mistakes, or incorrect/not fully correct/incomplete translations, or no translations at all. Fix all such cases.
 

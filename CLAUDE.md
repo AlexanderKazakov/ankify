@@ -1,1 +1,1 @@
-**Refer to AGENTS.md and other standard AI Agent instruction files**
+AGENTS.md
