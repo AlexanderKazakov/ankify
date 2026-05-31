@@ -29,8 +29,9 @@ class AnkiDeckCreator:
 
         deck = genanki.Deck(AnkiGuidGenerator.random_int_guid(), self.deck_name)
         media_files = set()
-        for entry in vocab:
+        for position, entry in enumerate(vocab, start=1):
             note = self._create_anki_note(entry)
+            note.due = position  # otherwise, new backward cards go only after all new forward cards have gone
             deck.add_note(note)
             media_files.add(str(entry.front_audio))
             media_files.add(str(entry.back_audio))

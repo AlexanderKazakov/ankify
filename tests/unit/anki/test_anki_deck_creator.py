@@ -1,9 +1,26 @@
 """Integration tests for AnkiDeckCreator."""
 
+import sqlite3
+import zipfile
+from pathlib import Path
+
 import pytest
 
 from ankify.anki.anki_deck_creator import AnkiDeckCreator
 from ankify.vocab_entry import VocabEntry
+
+
+def _read_cards(apkg_path: Path, extract_dir: Path) -> list[tuple[int, int, int]]:
+    """Return (note_id, card_ord, due) rows from the apkg's cards table."""
+    with zipfile.ZipFile(apkg_path) as archive:
+        archive.extract("collection.anki2", extract_dir)
+    conn = sqlite3.connect(str(extract_dir / "collection.anki2"))
+    try:
+        return conn.execute(
+            "SELECT nid, ord, due FROM cards ORDER BY nid, ord"
+        ).fetchall()
+    finally:
+        conn.close()
 
 
 class TestAnkiDeckCreator:
@@ -102,7 +119,14 @@ class TestAnkiDeckCreator:
         creator = AnkiDeckCreator(output_file, "Test", "basic")
 
         field_names = [f["name"] for f in creator.anki_note_model.fields]
-        expected = ["Front", "Back", "Front language", "Back language", "Front sound", "Back sound"]
+        expected = [
+            "Front",
+            "Back",
+            "Front language",
+            "Back language",
+            "Front sound",
+            "Back sound",
+        ]
         assert field_names == expected
 
 
@@ -206,6 +230,70 @@ class TestAnkiDeckCreatorPackaging:
         # Verify media files were set
         assert mock_package.media_files is not None
         assert len(mock_package.media_files) == 2
+
+
+class TestAnkiDeckCardOrdering:
+    """Tests that cards get incrementing positions so siblings stay together."""
+
+    @pytest.fixture
+    def temp_audio_files(self, tmp_path):
+        """Create temporary audio files for testing."""
+        front_audio = tmp_path / "front.mp3"
+        back_audio = tmp_path / "back.mp3"
+        front_audio.write_bytes(b"audio")
+        back_audio.write_bytes(b"audio")
+        return front_audio, back_audio
+
+    def _entries(self, count, audio):
+        front_audio, back_audio = audio
+        return [
+            VocabEntry(
+                front=f"front{i}",
+                back=f"back{i}",
+                front_language="English",
+                back_language="German",
+                front_audio=front_audio,
+                back_audio=back_audio,
+            )
+            for i in range(count)
+        ]
+
+    def test_basic_cards_get_incrementing_positions(self, tmp_path, temp_audio_files):
+        """Each basic note's single card gets a distinct, increasing position."""
+        output_file = tmp_path / "output.apkg"
+        creator = AnkiDeckCreator(output_file, "Test Deck", "basic")
+
+        creator.write_anki_deck(self._entries(3, temp_audio_files))
+
+        rows = _read_cards(output_file, tmp_path)
+        dues = sorted(due for _, _, due in rows)
+        assert dues == [1, 2, 3]
+
+    def test_basic_and_reversed_sibling_cards_share_position(
+        self, tmp_path, temp_audio_files
+    ):
+        """Forward and reverse cards of one note share the same position."""
+        output_file = tmp_path / "output.apkg"
+        creator = AnkiDeckCreator(output_file, "Test Deck", "basic_and_reversed")
+
+        creator.write_anki_deck(self._entries(3, temp_audio_files))
+
+        rows = _read_cards(output_file, tmp_path)
+
+        # 3 notes x 2 cards (forward + reverse)
+        assert len(rows) == 6
+
+        due_by_note: dict[int, dict[int, int]] = {}
+        for nid, card_ord, due in rows:
+            due_by_note.setdefault(nid, {})[card_ord] = due
+
+        # both cards of every note share the same position
+        for ords in due_by_note.values():
+            assert ords[0] == ords[1]
+
+        # notes have distinct, increasing positions starting at 1 (not all 0)
+        note_positions = sorted(ords[0] for ords in due_by_note.values())
+        assert note_positions == [1, 2, 3]
 
 
 class TestGenankinSortTypeFix:
