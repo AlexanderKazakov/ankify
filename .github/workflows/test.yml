@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.13"]
+        python-version: ["3.13"]
 
     steps:
       - uses: actions/checkout@v6
@@ -43,7 +43,7 @@ jobs:
             gstreamer1.0-plugins-ugly
 
       - name: Install dependencies
-        run: uv sync --extra local-all --extra dev
+        run: uv sync --extra tts-edge --extra tts-aws --extra tts-azure --extra dev
 
       - name: Format
         run: uv run --no-sync ruff format --check src/

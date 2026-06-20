@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import re
@@ -17,7 +16,6 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from ankify.anki.anki_deck_creator import AnkiDeckCreator
-from ankify.llm.jinja2_prompt_formatter import PromptRenderer
 from ankify.settings import (
     AWSProviderAccess,
     AzureProviderAccess,
@@ -181,147 +179,6 @@ else:
     logger.info("Using Edge TTS provider (as no AWS credentials found in env)")
 
 
-@mcp.prompt(
-    name="ankify",
-    title="Create Ankify Vocabulary Table or Deck",
-    description="Prompt to read and follow the packaged Ankify skill.",
-)
-def ankify() -> str:
-    logger.info("Received PROMPT request: ankify")
-    return """
-Create Anki deck from the context. \
-Read and follow the Ankify skill at `skill://anki-vocabulary-builder/SKILL.md`. \
-It is not a local file and is not a local skill. \
-The MCP server publishes its workflow instructions as MCP resources under the skill:// URI scheme. \
-Fetch them via your MCP resource-reading tool against server ankify.
-""".strip()
-
-
-@mcp.prompt(
-    title="Create Anki Deck",
-    description="Prompt to create Anki deck file from the vocabulary table. "
-    "The note type is deduced by the LLM automatically."
-    "The table has to be already present in the chat at the time of the prompting.",
-)
-def deck(
-    deck_name: str = Field(
-        default="Ankify",
-        description="Deck name (it's not the file name, it's the deck name within Anki)",
-    ),
-) -> str:
-    logger.info(
-        "Received PROMPT request: deck: deck_name '%s'",
-        deck_name,
-    )
-    return f"""
-Create Anki deck from the vocabulary table with the deck name: `{deck_name}`.
-Use the MCP tool `convert_TSV_to_Anki_deck` for this.
-
-If there are multiple vocabulary table versions in the chat, use the latest/actual/user-approved one.
-
-Deduce the note type from the vocabulary table, the tool description, and the previous instructions.
-If you are not sure, ask the user for the exact note type.
-
-Always put a full valid explicit clickable URI of the generated .apkg file in your answer, 
-not just the file name or path, even if the file is local. That URI is returned to you by the MCP tool.
-"""
-
-
-def _resolve_language_alias(language: str) -> str:
-    language = language.lower()
-    # todo - all these configs (and tts manager) should be kept as singletons
-    aliases_content = (
-        resources.files("ankify.resources")
-        .joinpath("language_aliases.json")
-        .read_text(encoding="utf-8")
-    )
-    aliases: dict[str, str] = json.loads(aliases_content)
-    if language in aliases:
-        return aliases[language]
-    return language
-
-
-def _resolve_instructions_for_language(language: str) -> str:
-    instructions_path = resources.files(
-        "ankify.resources.prompts.language_specific"
-    ).joinpath(f"{language.lower()}.md")
-    if instructions_path.is_file():
-        return instructions_path.read_text(encoding="utf-8")
-    return ""
-
-
-@mcp.prompt(
-    title="Create Vocabulary Table (universal parametrizable template)",
-    description="""
-Prompt to create vocabulary table in TSV format from the user input. 
-The universal template, to be parametrized with languages, note type, and additional custom instructions. 
-
-Languages can be specified quite flexibly like "English", "en", "ENG", "GE", "ger", "Rus", "russian", "Turkish", etc.
-
-Note type can be specified quite flexibly like "ba" (Basic), "br" (Basic & Reversed), "basic", "basic_and_reversed", "basic and reversed", "basic & reversed", "Basic & Reversed", etc.
-""",
-)
-def vocab(
-    language_studied: str = Field(
-        default="language_studied",
-        description="The language being studied (front side). Accepts flexible formats: 'English', 'en', 'ENG', 'GE', 'ger', 'Rus', 'russian', 'Turkish', etc.",
-    ),
-    language_known: str = Field(
-        default="language_known",
-        description="The known language (back side). Accepts flexible formats: 'English', 'en', 'ENG', 'GE', 'ger', 'Rus', 'russian', 'Turkish', etc.",
-    ),
-    note_type: str = Field(
-        default="br",
-        description="Type of Anki notes: 'basic' (ba) for one card per note, 'basic_and_reversed' (br) for two cards per note. Accepts flexible formats including 'basic', 'basic_and_reversed', 'basic and reversed', 'basic & reversed', 'ba', 'br'.",
-    ),
-    custom_instructions: str = Field(
-        default="",
-        description="Optional additional instructions to customize vocabulary generation (e.g., focus on specific topics, style preferences).",
-    ),
-) -> str:
-    logger.info(
-        "Received PROMPT request: vocab: language_studied '%s', language_known '%s', note_type '%s'",
-        language_studied,
-        language_known,
-        note_type,
-    )
-
-    note_type_raw = note_type.lower().strip()
-    if note_type_raw == "ba":
-        note_type = "basic"
-    elif note_type_raw == "br":
-        note_type = "basic_and_reversed"
-    else:
-        s = note_type_raw.replace("&", " and ")
-        s = re.sub(r"[\s\-]+", "_", s)
-        note_type = re.sub(r"_+", "_", s).strip("_")
-
-    if note_type not in ("basic", "basic_and_reversed"):
-        raise ValueError("Invalid note type")
-
-    template_content = (
-        resources.files("ankify.resources.prompts")
-        .joinpath("mcp_prompt_template.md.j2")
-        .read_text(encoding="utf-8")
-    )
-    language_studied = _resolve_language_alias(language_studied)
-    language_known = _resolve_language_alias(language_known)
-    language_studied_instructions = _resolve_instructions_for_language(language_studied)
-    language_known_instructions = _resolve_instructions_for_language(language_known)
-
-    return PromptRenderer.render(
-        template_content=template_content,
-        context={
-            "language_studied": language_studied,
-            "language_known": language_known,
-            "note_type": note_type,
-            "language_studied_instructions": language_studied_instructions,
-            "language_known_instructions": language_known_instructions,
-            "custom_instructions": custom_instructions,
-        },
-    )
-
-
 @mcp.custom_route("/health", methods=["GET"])
 async def health_check(request: Request):
     """Health check endpoint for Lambda Web Adapter."""
@@ -428,84 +285,14 @@ def package_anki_deck(
     return output_file
 
 
-def _prompt_result_text(result) -> str:
-    # MCP prompt content can be a typed text block or a plain string, depending on client API.
-    content = result.messages[0].content
-    if hasattr(content, "text"):
-        return content.text
-    return str(content)
-
-
-async def _test_vocab() -> None:
-    prompts_to_render = {
-        "vocab_en_ru_ba.md": {
-            "language_studied": "English",
-            "language_known": "Russian",
-            "note_type": "basic",
-        },
-        "vocab_en_ru_br.md": {
-            "language_studied": "eng",
-            "language_known": "ru",
-            "note_type": "basic and reversed",
-            "custom_instructions": "Some custom instructions...",
-        },
-        "vocab_ge_en_br.md": {
-            "language_studied": "ger",
-            "language_known": "en",
-            "note_type": "basic_and_reversed",
-        },
-        "vocab_ge_en_ba.md": {
-            "language_studied": "de",
-            "language_known": "eng",
-            "note_type": "ba",
-        },
-        "vocab_ar_tr_br.md": {
-            "language_studied": "ar",
-            "language_known": "tr",
-            "note_type": "br",
-        },
-    }
-
-    async with fastmcp.Client(mcp) as client:
-        for output_name, arguments in prompts_to_render.items():
-            result = await client.get_prompt("vocab", arguments)
-            Path("tmp", output_name).write_text(
-                _prompt_result_text(result),
-                encoding="utf-8",
-            )
-
-
-async def _test_convert_TSV_to_Anki_deck() -> None:
-    async with fastmcp.Client(mcp) as client:
-        result = await client.call_tool(
-            "convert_TSV_to_Anki_deck",
-            {
-                "tsv_vocabulary": """Hello World!\tHallo Welt!\tEng\tGe
-Как дела?\t¿Cómo estás?\tRus\tSpanish
-كم تبلغ من العمر؟\t你今年多大\tArabic\tChinese""",
-                "note_type": "basic_and_reversed",
-                "deck_name": "Ankify Test Deck",
-            },
-        )
-    logger.info("Ankify Test Deck: %s", result.data or result.content[0].text)
-
-
-async def _test_all() -> None:
-    await _test_vocab()
-    await _test_convert_TSV_to_Anki_deck()
-
-
 if __name__ == "__main__":
-    # import asyncio
-    # asyncio.run(_test_all())
-
     # Local (stdio) MCP mode
     mcp.run(transport="stdio")
     sys.exit(0)
 
 
 # ASGI app for uvicorn (used in Docker with Lambda Web Adapter)
-# About parameters see docs/mcp-http-transport-options.md
+# About parameters see docs/ai_reports/mcp-http-transport-options.md
 app = mcp.http_app(
     stateless_http=True,
     json_response=True,

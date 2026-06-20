@@ -3,18 +3,16 @@
 
 ## Project Overview
 
-Ankify converts arbitrary text into Anki vocabulary decks with text-to-speech audio. It operates as both a CLI tool and an MCP (both local and http on AWS) server.
+Ankify converts vocabulary tables into Anki decks with text-to-speech audio. It runs as an MCP server (local stdio and HTTP on AWS) that exposes a single tool and the vocabulary-builder skill as a resource. The AI client builds the vocabulary table by following the skill, then calls the tool.
 
-**Data flow:** Input Text → LLM → Vocabulary Table (TSV) → TTS → Audio Files → Anki Deck (.apkg)
+**Data flow:** Vocabulary Table (TSV, built by the AI client following the skill) → TTS → Audio Files → Anki Deck (.apkg)
 
 ### Components
 
-- **MCP Server** (`src/ankify/mcp/`) - FastMCP server exposing prompts and tools to AI clients
+- **MCP Server** (`src/ankify/mcp/`) - FastMCP server exposing a single tool (`convert_TSV_to_Anki_deck`) and the vocabulary-builder skill as a resource (`SkillProvider`). No prompts, no Jinja templating.
 - **TTS** (`src/ankify/tts/`) - `TTSManager` orchestrating Azure, AWS Polly, and Edge TTS providers
 - **Anki** (`src/ankify/anki/`) - Deck creation with `genanki`
-- **Pipeline** (`src/ankify/pipeline.py`) - Main CLI orchestrator coordinating LLM vocabulary generation, TTS, and Anki packaging
 - **Settings** (`src/ankify/settings.py`) - Pydantic configuration
-- **LLM** (`src/ankify/llm/`) - `OpenAIClient` implementation (for CLI only); Jinja2 prompt templating
 - **Deployment** (`infra/`) - CDK infrastructure as code for AWS deployment
 
 ## Development Commands
@@ -23,7 +21,7 @@ Ankify converts arbitrary text into Anki vocabulary decks with text-to-speech au
 
 ```bash
 # Install for development
-uv pip install -e ".[local-all,dev]"
+uv pip install -e ".[local-mcp,tts-aws,tts-azure,dev]"
 
 # Sync dependencies from lockfile
 uv sync --all-extras
@@ -46,8 +44,8 @@ read compressed MP3 audio during speech-to-text verification.
 
 ### Permissions & Automation
 
-- **Python, pip, tests, etc. execution:** Only through `uv run` or `uv pip`. Direct `python`, `pip`, `pytest`, `ruff`, etc. calls are denied.
-- **File operations:** No `rm`, `mv`, `rmdir`, `chmod`, `chown`. Use `mkdir`, `cp`, `touch` freely. Use the `Edit`/`Write` / `MultiEdit` / etc. tools for file content changes.
+- **Python, pip, tests, etc. execution:** Always through `uv run` or `uv pip`. Do not invoke `python`, `pip`, `pytest`, `ruff` directly.
+- **File operations:** Avoid destructive shell commands (`rm`, `mv`, `rmdir`, `chmod`, `chown`). Use the `Edit` / `Write` tools for file content changes.
 - **Git:** Read-only. No commits, pushes, checkouts, merges, rebases, or any state-changing operations.
 - **AWS/CDK:** Read-only. Inspect with `aws ... list-*`, `aws ... get-*`, `aws ... describe-*`, etc. Use `cdk synth` and `cdk diff` for validation. No `cdk deploy`, no S3 writes, no Lambda updates, etc.
 - **Docker:** Build and inspect only. No `docker run`, `docker push`, or container/image management.
@@ -70,9 +68,4 @@ Default AWS region is `eu-central-1`. Default Azure region is `westeurope`. Bett
 
 ## Workflow
 
-Always when you substantially change the code:
-
-- mind the existing tests (and adjust them if you change behavior)
-- write new tests covering new functionality
-- run all relevant tests to check everything works as expected
-- do not stop until all the tests pass and you're sure about what you've done
+Always when you change the code, check the tests for regressions, and add new tests when relevant.

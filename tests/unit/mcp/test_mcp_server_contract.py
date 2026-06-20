@@ -13,68 +13,11 @@ def mcp_server(monkeypatch):
     return importlib.import_module("ankify.mcp.ankify_mcp_server")
 
 
-def _prompt_text(result) -> str:
-    content = result.messages[0].content
-    if hasattr(content, "text"):
-        return content.text
-    return str(content)
-
-
 def _resource_text(result) -> str:
     content = result[0]
     if hasattr(content, "text"):
         return content.text
     return str(content)
-
-
-@pytest.mark.asyncio
-async def test_public_prompts_are_registered(mcp_server):
-    async with Client(mcp_server.mcp) as client:
-        prompts = await client.list_prompts()
-
-    prompt_names = {prompt.name for prompt in prompts}
-
-    assert "ankify" in prompt_names
-    assert "deck" in prompt_names
-    assert "vocab" in prompt_names
-
-
-@pytest.mark.asyncio
-async def test_ankify_prompt_points_to_packaged_skill(mcp_server):
-    async with Client(mcp_server.mcp) as client:
-        result = await client.get_prompt("ankify", {})
-
-    text = _prompt_text(result)
-
-    assert "skill://anki-vocabulary-builder/SKILL.md" in text
-    assert "FieldInfo" not in text
-    assert "annotation=NoneType" not in text
-
-
-@pytest.mark.asyncio
-async def test_deck_prompt_uses_default_deck_name(mcp_server):
-    async with Client(mcp_server.mcp) as client:
-        result = await client.get_prompt("deck", {})
-
-    text = _prompt_text(result)
-
-    assert "`Ankify`" in text
-    assert "FieldInfo" not in text
-    assert "annotation=NoneType" not in text
-
-
-@pytest.mark.asyncio
-async def test_vocab_prompt_uses_real_default_values(mcp_server):
-    async with Client(mcp_server.mcp) as client:
-        result = await client.get_prompt("vocab", {})
-
-    text = _prompt_text(result)
-
-    assert "language_studied" in text
-    assert "language_known" in text
-    assert "The dictionary is one-way." in text
-    assert "FieldInfo" not in text
-    assert "annotation=NoneType" not in text
 
 
 @pytest.mark.asyncio

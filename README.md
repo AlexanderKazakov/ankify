@@ -1,17 +1,20 @@
 # Ankify
 
-Create Anki decks with text-to-speech audio from arbitrary input using LLM and TTS services.
+Create Anki decks with text-to-speech audio from a vocabulary table.
+
+Ankify runs as an MCP server. An MCP-compatible AI client builds the vocabulary
+table by following the packaged skill, then calls a single tool that synthesizes
+the audio and packages everything into an Anki `.apkg` file.
 
 ## Features
 
-- **MCP Server**: Use with any MCP-compatible AI client, locally or in the cloud. No need for any API keys
-- **Agent Skill**: `src/ankify/resources/skills/anki-vocabulary-builder/` - the standard `SKILL.md`-format folder you can copy to your agent's skills
-- **CLI**: Standalone command-line tool, uses LLM through openai-compatible API
-- **Multi-language TTS**: Azure, AWS Polly, and free Edge TTS support
-- **Customizable prompts**: Curated vocabulary creation prompt templates for any language pair and note type with few-shot examples and custom instructions
+- **MCP Server**: Use with any MCP-compatible AI client, locally or in the cloud. No need for any API keys for local usage with free Edge TTS.
+- **Agent Skill**: `src/ankify/resources/skills/anki-vocabulary-builder/` - a standard `SKILL.md`-format folder. It is exposed by the MCP server as a resource (`skill://anki-vocabulary-builder/SKILL.md`) and can also be copied directly into your agent's skills.
+- **One tool**: `convert_TSV_to_Anki_deck` - converts a TSV vocabulary table into an Anki `.apkg` file with TTS audio.
+- **Multi-language TTS**: Azure, AWS Polly, and free Edge TTS support.
 - **Packed to Anki**: The resulting `.apkg` file is to be opened in Anki.
 
-If the deck name in settings is equal to the name of an existing deck in your Anki, it will be loaded directly into the existing deck. Clarification of possible notes types: see [docs/Anki_note_types.md](docs/Anki_note_types.md).
+If the deck name is equal to the name of an existing deck in your Anki, it will be loaded directly into the existing deck. Clarification of possible note types: see [docs/Anki_note_types.md](docs/Anki_note_types.md). On the order of new cards, see [docs/Anki_new_card_order.md](docs/Anki_new_card_order.md).
 
 ## Installation
 
@@ -23,42 +26,38 @@ uv venv --python 3.12
 
 ### Local MCP Server
 
-For local MCP server with free Edge TTS:
+For a local MCP server with free Edge TTS:
 
 ```bash
 uv pip install -e .[local-mcp]
 ```
 
-### Local CLI Application (minimal installation)
-
-For local CLI application with free Edge TTS:
+To also enable Azure and AWS Polly TTS providers (require API keys), add their extras:
 
 ```bash
-uv pip install -e .[local-cli]
-```
-
-### Full Local (CLI + MCP + All TTS)
-
-For all the features including CLI and all TTS providers:
-
-```bash
-uv pip install -e .[local-all]
+uv pip install -e .[local-mcp,tts-azure,tts-aws]
 ```
 
 ### AWS Lambda Deployment
 
-See [infra/README.md](infra/README.md) for deployment instructions.
+See [infra/README.md](infra/README.md) for deployment instructions. The AWS IAM
+setup is documented in [docs/aws_iam_settings.md](docs/aws_iam_settings.md).
 
 ### Development
 
 ```bash
-uv pip install -e .[local-all,dev]
+uv pip install -e .[local-mcp,tts-aws,tts-azure,dev]
 ```
 
 #### Tests
 Run all tests:
 ```bash
 uv run pytest
+```
+
+Run the fast tests only (skip the TTS provider tests):
+```bash
+uv run pytest tests/ --ignore=tests/unit/tts/test_tts_providers.py
 ```
 
 The full TTS provider test (`tests/unit/tts/test_tts_providers.py`) generates MP3
@@ -91,12 +90,9 @@ uv run pytest tests/path/to/test_file.py::test_name -v
 uv run ruff check src/
 ```
 
-
 ## MCP Server
 
-Ankify provides an MCP server for integration with LLM clients.
-
-### Local MCP Server
+### Local MCP Server (stdio)
 
 Add to your MCP client (Claude Desktop, Cursor, etc.) configuration:
 
@@ -118,31 +114,25 @@ Add to your MCP client (Claude Desktop, Cursor, etc.) configuration:
 }
 ```
 
-### AWS Deployment
+### AWS Deployment (HTTP)
 
 Deploy to AWS Lambda for hosted MCP access. See [infra/README.md](infra/README.md) for instructions.
 
-### MCP Tools & Prompts
+### Tools & Resources
 
-**Prompts:**
+**Resource:**
 
-- `ankify` - Recommended prompt "Read and follow the packaged Ankify skill exposed by the MCP server"
-- `vocab` - Create vocabulary table (universal template for any language pair, note type, custom instructions)
-- `deck` - Create Anki deck from vocabulary table (instructs AI to use the conversion tool properly)
+- `skill://anki-vocabulary-builder/SKILL.md` - the packaged Ankify skill, exposed through FastMCP's skill provider. The AI client reads and follows it to build the vocabulary table (it can also be copied and used as a normal `SKILL.md` skill).
 
-**Resources:**
+**Tool:**
 
-- `skill://anki-vocabulary-builder/SKILL.md` - Packaged Ankify skill instructions exposed through FastMCP's skill provider (can also be copied and used as a normal `SKILL.md` skill)
-
-**Tools:**
-
-- `convert_TSV_to_Anki_deck` - Convert TSV vocabulary to .apkg file
+- `convert_TSV_to_Anki_deck` - convert a TSV vocabulary table to an `.apkg` file with TTS audio. The AI client should read the skill resource before calling this tool.
 
 ## TTS Providers
 
 | Provider  | Package                            | Cost             | Notes                                                                              |
 | --------- | ---------------------------------- | ---------------- | ---------------------------------------------------------------------------------- |
-| Azure     | `azure-cognitiveservices-speech` | Paid (free tier) | The broadest language support. Good quality. "Neural" engines only.               |
+| Azure     | `azure-cognitiveservices-speech` | Paid (free tier) | The broadest language support. Good quality. "Neural" engines only.               |
 | AWS Polly | `boto3`                          | Paid (free tier) | Good quality for "Neural" engine. Worse for languages with "Standard" engine only. |
 | Edge      | `edge-tts`                       | Free             | Good quality, same to Azure. May rate-limit, but usually enough for local usage.   |
 
@@ -155,10 +145,6 @@ uv pip install -e .[tts-azure]
 uv pip install -e .[tts-aws]
 uv pip install -e .[tts-edge]
 ```
-
-## CLI
-
-For CLI usage documentation, see [docs/CLI.md](docs/CLI.md).
 
 ## Environment Variables
 
