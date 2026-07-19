@@ -13,7 +13,7 @@ Because the languages alternate from row to row, use `Front` and `Back` as the t
 | the other LANGUAGE_KNOWN translation | the other LANGUAGE_STUDIED word    |
 
 
-In general, the reverse row just repeats the forward row with the two cells swapped, but not always. Think about it: consider when it is better to adjust, extend, or even split a row into several rows to make the Anki cards clearer. Imagine yourself learning this table in the following way: given the Front cell, you need to recall the Back cell. Sometimes one direction is good, but the opposite direction is awkward with a plain swap. Then you need to adjust or extend the Front cell, or even split the row into several rows. The goal is a meaningful set of cards for learning the Back given the Front, not just a copy of every row with the cells swapped.
+The default is simple: the reverse row is the forward row with the two cells swapped **verbatim**, synonyms and all. For the large majority of rows this plain mirror is exactly right, so do it by default and do not look for ways to "improve" it. Deviate only in specific situations, described below.
 
 ## Examples
 
@@ -28,18 +28,29 @@ If we were building an English-Russian vocabulary:
 | стул  | chair |
 
 
-Both directions are unambiguous. Do not invent synonyms just to make the reverse row "richer" — clean one-to-one pairs are the easiest cards to learn.
+Both directions are unambiguous. Do not **invent** new synonyms just to make the reverse row "richer" — clean one-to-one pairs are the easiest cards to learn. This means do not fabricate extra synonyms that were not there. It does NOT mean dropping synonyms the forward row already has: those are kept on both sides (see the "synonyms are mirrored" example below).
 
 ### Example: a fixed phrase stays a phrase
 
 
-| Front         | Back                    |
-| ------------- | ----------------------- |
-| to take place | иметь место, состояться |
-| иметь место   | to take place, to occur |
+| Front                   | Back                    |
+| ----------------------- | ----------------------- |
+| to take place, to occur | иметь место, состояться |
+| иметь место, состояться | to take place, to occur |
 
 
-The Russian side keeps the phrase form; the reverse card does not collapse to a single verb. Pair a phrase with a phrase, a verb with a verb.
+Both sides keep the phrase form — the reverse does not collapse to a single verb. Note that both synonyms appear on both sides: the reverse prompt keeps `состояться`, it is not trimmed. Pair a phrase with a phrase, a verb with a verb.
+
+### Example: comma-separated synonyms are mirrored on both sides
+
+
+| Front                                    | Back                                     |
+| ---------------------------------------- | ---------------------------------------- |
+| bereavement                              | тяжёлая утрата, потеря близкого человека |
+| тяжёлая утрата, потеря близкого человека | bereavement                              |
+
+
+The two Russian phrases are synonyms for ONE meaning — they are comma-separated, not semicolon-separated. Keep all of them on BOTH sides. Do not drop one to make the reverse prompt look "cleaner": a prompt made of synonyms is fine, and it reinforces both. The reverse row here is simply the forward row with the cells swapped verbatim, which is exactly what it should be. Contrast this with the next example, where the items are DIFFERENT meanings and the reverse must be split instead.
 
 ### Example: splitting when one word has several distinct meanings
 
@@ -52,7 +63,7 @@ Bad:
 | банк; берег реки | bank             |
 
 
-`банк` and `берег реки` are two different prompts; a combined reverse card is unanswerable.
+`банк` and `берег реки` are two different unrelated things; a combined reverse card is extremely awkward. The semicolon is the signal: it separates different meanings, not synonyms.
 
 Good:
 
@@ -79,15 +90,18 @@ When a word's meaning shifts dramatically depending on what it is used with, the
 | сесть на автобус   | to take a bus      |
 
 
-Listing "to take" alone would force an unnatural combined reverse translation like "сделать, принять, сесть на …", which no learner could naturally produce. Locking each row to one collocation — the same collocation on both sides — makes both directions answerable.
+Listing "to take" alone would force an unnatural combined reverse translation like "сделать, принять, сесть на …", which no learner could naturally produce. Locking each row to one collocation — the same collocation on both sides — makes both directions answerable. Do not hesitate to add collocations if that makes things cleaner and simpler.
 
 ## Rule of thumb
 
-For each forward (LANGUAGE_STUDIED → LANGUAGE_KNOWN) row, draft the reverse row and ask:
+The default reverse row is the forward row with the two cells swapped **verbatim**, including every comma-separated synonym. This plain mirror is the correct answer for most rows. Start there, and deviate only for one of the two specific reasons below. The number of synonyms in a cell is NEVER a reason to deviate — a prompt made of comma-synonyms is good, not noise.
 
-- Is the reverse prompt (the LANGUAGE_KNOWN cell) ambiguous? → split the reverse into separate rows or add collocations.
-- Is the reverse direction phrased awkwardly with a straight swap? → adjust or extend the reverse cell or add collocations.
-- Is everything unambiguous in both directions? → leave the reverse as a plain swap; do not over-engineer.
+Deviate only when:
+
+- **The cell holds several DIFFERENT meanings (semicolon-separated).** Then the reverse prompt would be unanswerable, so split the reverse into separate rows, one per meaning, and add a collocation where a bare word is still ambiguous. (See the `bank` example.) Comma-separated synonyms do NOT trigger this — they are one meaning, so mirror them.
+- **A straight swap is grammatically awkward or unnatural in the reverse direction.** Then adjust or extend the wording so the reverse reads naturally, or add a collocation to both sides.
+
+If neither applies — and for the large majority of rows neither does — leave the reverse as the verbatim mirror. Do not trim synonyms, do not reorder, do not "improve" it.
 
 ## Building the TSV
 
